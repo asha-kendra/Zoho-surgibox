@@ -1,0 +1,20 @@
+{
+  "id": "surgibox-package-slip",
+  "project_name": "surgibox-package-slip",
+  "platform_version": "2",
+  "functions": {
+    "directories": [
+      {
+        "name": "package-slip-api",
+        "functionName": "package-slip-api",
+        "lang": "Node.js",
+        "type": "Advanced IO",
+        "entryFile": "index.js"
+      }
+    ]
+  },
+  "web": {
+    "name": "app",
+    "path": "public/app"
+  }
+}
