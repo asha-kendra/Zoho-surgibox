@@ -122,8 +122,9 @@
       position: relative;
     }
 
-    /* ── SurgiBox Logo SVG ────────────────────────── */
-    .logo-svg { display: block; width: 140px; }
+    /* ── SurgiBox Logo ────────────────────────────── */
+    .logo-svg { display: block; width: 160px; }
+    .logo-img { display: block; height: 56px; width: auto; }
 
     /* ── Page 1: header ───────────────────────────── */
     .doc-header {
@@ -425,12 +426,16 @@
   <div class="page" id="page-1">
 
     <div class="doc-header">
-      <!-- SurgiBox Logo -->
-      <svg class="logo-svg" viewBox="0 0 160 52" xmlns="http://www.w3.org/2000/svg">
-        <rect x="1" y="1" width="42" height="42" rx="2.5" fill="none" stroke="#C8102E" stroke-width="2.8"/>
-        <text x="9" y="34" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="28" fill="#C8102E">S</text>
-        <text x="48" y="34" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="26" fill="#C8102E">urgiBox</text>
-        <text x="152" y="38" font-family="Arial, sans-serif" font-size="9" fill="#C8102E">®</text>
+      <!-- SurgiBox Logo — place logo file at public/app/assets/surgibox-logo.png -->
+      <img src="assets/surgibox-logo.png" alt="SurgiBox" class="logo-img"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <!-- SVG fallback (hidden when image loads) -->
+      <svg class="logo-svg" style="display:none;" viewBox="0 0 200 72" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="196" height="68" rx="6" fill="none" stroke="#C8102E" stroke-width="4"/>
+        <text x="100" y="50" text-anchor="middle"
+              font-family="'Arial Black',Arial,sans-serif"
+              font-weight="900" font-size="36" fill="#C8102E">SurgiBox</text>
+        <text x="188" y="16" font-family="Arial,sans-serif" font-size="11" fill="#C8102E">®</text>
       </svg>
 
       <!-- Company address -->
