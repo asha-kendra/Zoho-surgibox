@@ -429,13 +429,24 @@
       <!-- SurgiBox Logo — place logo file at public/app/assets/surgibox-logo.png -->
       <img src="assets/surgibox-logo.png" alt="SurgiBox" class="logo-img"
            onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-      <!-- SVG fallback (hidden when image loads) -->
-      <svg class="logo-svg" style="display:none;" viewBox="0 0 200 72" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="2" width="196" height="68" rx="6" fill="none" stroke="#C8102E" stroke-width="4"/>
-        <text x="100" y="50" text-anchor="middle"
-              font-family="'Arial Black',Arial,sans-serif"
-              font-weight="900" font-size="36" fill="#C8102E">SurgiBox</text>
-        <text x="188" y="16" font-family="Arial,sans-serif" font-size="11" fill="#C8102E">®</text>
+      <!-- SVG fallback (hidden when image loads) — traced from brand logo -->
+      <svg class="logo-svg" style="display:none;" viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg" aria-label="SurgiBox">
+        <path d="M 122,13 L 316,13 Q 327,13 327,24 L 327,96"
+              fill="none" stroke="#C8102E" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 13,118 L 13,198 Q 13,209 24,209 L 316,209 Q 327,209 327,198 L 327,152"
+              fill="none" stroke="#C8102E" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="6" y="170"
+              font-family="'Arial Black','Arial Bold',Arial,sans-serif"
+              font-weight="900" font-size="84" fill="#C8102E" letter-spacing="-1">Surgi</text>
+        <g transform="translate(183,58)" fill="#C8102E">
+          <rect x="2" y="10" width="22" height="16" rx="1"/>
+          <polygon points="13,0 0,12 26,12"/>
+          <rect x="8" y="16" width="8" height="10" rx="1" fill="#fff"/>
+        </g>
+        <text x="212" y="170"
+              font-family="'Arial Black','Arial Bold',Arial,sans-serif"
+              font-weight="900" font-size="84" fill="#C8102E" letter-spacing="-1">Box</text>
+        <text x="318" y="22" font-family="Arial,sans-serif" font-size="18" fill="#C8102E">®</text>
       </svg>
 
       <!-- Company address -->
