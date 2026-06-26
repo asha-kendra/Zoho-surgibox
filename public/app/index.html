@@ -141,25 +141,28 @@
     }
     .company-address strong { font-size: 13px; font-weight: 700; color: var(--ink); }
 
-    /* ── Bill To + Order Meta ─────────────────────── */
+    /* ── Bill To / Ship To / Order Meta ───────────── */
     .doc-meta {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr 1fr auto;
       gap: 24px;
       margin-bottom: 28px;
       align-items: start;
     }
-    .bill-to-label {
+    .addr-label {
       font-size: 12px;
       color: var(--muted);
       margin-bottom: 4px;
     }
-    .bill-to-name {
+    .addr-name {
       font-size: 14px;
       font-weight: 700;
       color: var(--ink);
       margin-bottom: 4px;
     }
+    /* keep old class names working as aliases */
+    .bill-to-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .bill-to-name  { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
     .bill-to-address {
       font-size: 12px;
       line-height: 1.75;
@@ -440,12 +443,17 @@
       </div>
     </div>
 
-    <!-- Bill To + Order Meta -->
+    <!-- Bill To / Ship To / Order Meta -->
     <div class="doc-meta">
       <div>
         <div class="bill-to-label">Bill To</div>
         <div class="bill-to-name" id="customer-name">—</div>
         <div class="bill-to-address" id="billing-address">—</div>
+      </div>
+      <div>
+        <div class="addr-label">Ship To</div>
+        <div class="addr-name" id="ship-name">—</div>
+        <div class="bill-to-address" id="shipping-address">—</div>
       </div>
       <div>
         <table class="order-meta-table">
@@ -464,13 +472,14 @@
       <thead>
         <tr>
           <th style="width:28px;">#</th>
-          <th style="width:130px;">Item</th>
+          <th style="width:120px;">Item</th>
           <th>Description</th>
-          <th style="width:80px;">HS Code</th>
-          <th style="width:80px;">Country of Origin</th>
-          <th style="width:60px;" class="r">Qty</th>
-          <th style="width:70px;" class="r">Rate</th>
-          <th style="width:80px;" class="r">Amount</th>
+          <th style="width:72px;">HS Code</th>
+          <th style="width:72px;">Country of Origin</th>
+          <th style="width:52px;" class="r">Qty</th>
+          <th style="width:64px;" class="r">Rate</th>
+          <th style="width:68px;" class="r">Discount</th>
+          <th style="width:72px;" class="r">Amount</th>
         </tr>
       </thead>
       <tbody id="items-body">
@@ -623,9 +632,14 @@
     $id('auth-date').textContent = fmtDate(so.date || pkg.date);
 
     // Customer
-    $id('customer-name').textContent = contact.contact_name || so.customer_name || '—';
-    const billAddr = so.billing_address || contact.billing_address || {};
-    $id('billing-address').innerHTML = buildAddress(billAddr).replace(/\n/g, '<br>');
+    const customerName = contact.contact_name || so.customer_name || '—';
+    $id('customer-name').textContent = customerName;
+    $id('ship-name').textContent = customerName;
+
+    const billAddr = so.billing_address  || contact.billing_address  || {};
+    const shipAddr = so.shipping_address || contact.shipping_address || {};
+    $id('billing-address').innerHTML  = buildAddress(billAddr).replace(/\n/g, '<br>');
+    $id('shipping-address').innerHTML = buildAddress(shipAddr).replace(/\n/g, '<br>');
 
     // Items
     const items = pkg.line_items || [];
@@ -637,14 +651,18 @@
       let subtotalSum = 0;
 
       $id('items-body').innerHTML = items.map((li, i) => {
-        const soLi = soItems[li.so_line_item_id] || {};
-        const rate   = soLi.rate   != null ? soLi.rate   : li.rate;
-        const qty    = li.quantity != null ? li.quantity : soLi.quantity;
-        const amount = rate != null && qty != null ? parseFloat(rate) * parseFloat(qty) : soLi.item_total;
-        const hs     = soLi.hsn_or_sac || li.hsn_or_sac || '';
-        const origin = soLi.custom_fields?.find(f => f.label?.toLowerCase().includes('origin'))?.value
-                    || li.country_of_origin || '';
-        const desc   = soLi.description || li.description || '';
+        const soLi    = soItems[li.so_line_item_id] || {};
+        const rate    = soLi.rate   != null ? soLi.rate   : li.rate;
+        const qty     = li.quantity != null ? li.quantity : soLi.quantity;
+        const disc    = soLi.discount != null ? parseFloat(soLi.discount) : null;
+        const gross   = rate != null && qty != null ? parseFloat(rate) * parseFloat(qty) : null;
+        const amount  = gross != null && disc != null ? gross - disc
+                      : soLi.item_total != null ? parseFloat(soLi.item_total)
+                      : gross;
+        const hs      = soLi.hsn_or_sac || li.hsn_or_sac || '';
+        const origin  = soLi.custom_fields?.find(f => f.label?.toLowerCase().includes('origin'))?.value
+                     || li.country_of_origin || '';
+        const desc    = soLi.description || li.description || '';
         if (amount) subtotalSum += parseFloat(amount) || 0;
 
         return `<tr>
@@ -655,6 +673,7 @@
           <td class="c">${origin || '—'}</td>
           <td class="r">${fmt(qty)}<br><span style="color:#888;font-size:10.5px;">${soLi.unit || li.unit || ''}</span></td>
           <td class="r">${rate != null ? fmt(rate) : '—'}</td>
+          <td class="r">${disc != null && disc > 0 ? fmt(disc) : '—'}</td>
           <td class="r">${amount != null ? fmt(amount) : '—'}</td>
         </tr>`;
       }).join('');
