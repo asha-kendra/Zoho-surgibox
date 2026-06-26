@@ -3,258 +3,306 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SurgiBox Package Slip</title>
+  <title>SurgiBox — Package Slip</title>
   <style>
-    /* ── Reset & Base ─────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: #f0f4f8;
-      min-height: 100vh;
-      color: #1a2a3a;
+    :root {
+      --red:    #C8102E;
+      --ink:    #1A1A1A;
+      --body:   #333333;
+      --muted:  #666666;
+      --rule:   #CCCCCC;
+      --light:  #F5F5F5;
+      --white:  #FFFFFF;
     }
 
-    /* ── Loader ───────────────────────────────────────── */
+    /* ── Action Bar (hidden at print) ─────────────── */
+    .action-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .bar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    .bar-pkg {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .bar-pkg strong { color: var(--ink); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.13s;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .btn-ghost {
+      background: #fff;
+      color: var(--ink);
+      border-color: var(--rule);
+    }
+    .btn-ghost:hover { background: var(--light); }
+    .btn-red {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--red);
+    }
+    .btn-red:hover { background: #a80d24; }
+
+    /* ── Page wrapper ─────────────────────────────── */
+    body {
+      background: #E8E8E8;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      color: var(--body);
+      padding-top: 56px;
+    }
+
+    /* ── States ───────────────────────────────────── */
     #loader {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      gap: 16px;
+      min-height: calc(100vh - 56px);
+      gap: 14px;
     }
     .spinner {
-      width: 48px; height: 48px;
-      border: 4px solid #e2e8f0;
-      border-top-color: #1a3a5c;
+      width: 36px; height: 36px;
+      border: 3px solid #ddd;
+      border-top-color: var(--red);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Error State ──────────────────────────────────── */
     #error-state {
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      gap: 12px;
-      padding: 32px;
+      min-height: calc(100vh - 56px);
+      gap: 10px;
       text-align: center;
+      padding: 32px;
     }
-    .error-icon { font-size: 48px; }
-    #error-state h2 { font-size: 22px; color: #c53030; }
-    #error-state p  { color: #666; max-width: 400px; }
+    #error-state h2 { font-size: 18px; color: var(--red); }
+    #error-state p  { color: var(--muted); max-width: 380px; font-size: 13px; }
 
-    /* ── Action Bar ───────────────────────────────────── */
-    #action-bar {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid #e2e8f0;
-      padding: 12px 24px;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    #action-bar .bar-title {
-      font-weight: 700;
-      color: #1a3a5c;
-      font-size: 16px;
-      flex: 1;
+    /* ── Document pages ───────────────────────────── */
+    #slip-wrapper { display: none; padding: 24px 16px 40px; }
+
+    .page {
+      background: var(--white);
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto 24px;
+      padding: 48px 52px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      position: relative;
     }
 
-    /* Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 18px;
-      border-radius: 8px;
+    /* ── SurgiBox Logo SVG ────────────────────────── */
+    .logo-svg { display: block; width: 140px; }
+
+    /* ── Page 1: header ───────────────────────────── */
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 32px;
+      gap: 20px;
+    }
+    .company-address {
+      text-align: right;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--body);
+    }
+    .company-address strong { font-size: 13px; font-weight: 700; color: var(--ink); }
+
+    /* ── Bill To + Order Meta ─────────────────────── */
+    .doc-meta {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      margin-bottom: 28px;
+      align-items: start;
+    }
+    .bill-to-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .bill-to-name {
       font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all 0.15s;
-      text-decoration: none;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .bill-to-address {
+      font-size: 12px;
+      line-height: 1.75;
+      color: var(--body);
+    }
+    .order-meta-table {
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .order-meta-table td {
+      padding: 3px 0;
+      vertical-align: top;
+    }
+    .order-meta-table td:first-child {
+      font-weight: 700;
+      color: var(--ink);
+      padding-right: 24px;
       white-space: nowrap;
     }
-    .btn-primary {
-      background: #1a3a5c;
-      color: #fff;
-    }
-    .btn-primary:hover { background: #12283f; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,58,92,0.3); }
-    .btn-secondary {
-      background: #fff;
-      color: #1a3a5c;
-      border: 2px solid #1a3a5c;
-    }
-    .btn-secondary:hover { background: #f0f4f8; transform: translateY(-1px); }
-    .btn-success {
-      background: #276749;
-      color: #fff;
-    }
-    .btn-success:hover { background: #1e4f37; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(39,103,73,0.3); }
-
-    /* ── Slip Container ───────────────────────────────── */
-    #slip-wrapper {
-      display: none;
-      padding: 80px 16px 40px;
-      max-width: 860px;
-      margin: 0 auto;
+    .order-meta-table td:last-child {
+      color: var(--body);
     }
 
-    /* ── Package Slip Card ────────────────────────────── */
-    .slip {
-      background: #fff;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    }
-
-    /* Header */
-    .slip-header {
-      background: linear-gradient(135deg, #1a3a5c 0%, #2d5986 100%);
-      padding: 32px 40px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-    .slip-brand { color: #fff; }
-    .slip-brand h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
-    .slip-brand p { color: #a8c4e0; font-size: 13px; margin-top: 2px; }
-
-    .slip-badge {
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 10px;
-      padding: 12px 20px;
-      text-align: right;
-      color: #fff;
-    }
-    .slip-badge .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #a8c4e0; }
-    .slip-badge .value { font-size: 20px; font-weight: 700; margin-top: 2px; }
-
-    /* Meta row */
-    .slip-meta {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 0;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .meta-cell {
-      padding: 18px 24px;
-      border-right: 1px solid #e2e8f0;
-    }
-    .meta-cell:last-child { border-right: none; }
-    .meta-cell .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #888; font-weight: 600; }
-    .meta-cell .value { font-size: 15px; font-weight: 600; color: #1a2a3a; margin-top: 4px; }
-    .meta-cell .value.status { display: inline-flex; align-items: center; gap: 6px; }
-    .status-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #276749;
-      display: inline-block;
-    }
-
-    /* Body: two-column addresses */
-    .slip-addresses {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    @media (max-width: 560px) {
-      .slip-addresses { grid-template-columns: 1fr; }
-    }
-    .address-block {
-      padding: 24px 28px;
-      border-right: 1px solid #e2e8f0;
-    }
-    .address-block:last-child { border-right: none; }
-    .address-block h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #888; font-weight: 600; margin-bottom: 10px; }
-    .address-block p { font-size: 14px; line-height: 1.7; color: #333; }
-    .address-block strong { color: #1a2a3a; font-size: 15px; }
-
-    /* Items table */
-    .slip-items { padding: 28px; }
-    .slip-items h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; color: #888; font-weight: 600; margin-bottom: 16px; }
-
-    .items-table { width: 100%; border-collapse: collapse; }
-    .items-table thead tr { background: #f7f9fc; }
-    .items-table th {
-      padding: 10px 14px;
-      text-align: left;
+    /* ── Items table ──────────────────────────────── */
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
       font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: #555;
-      border-bottom: 2px solid #e2e8f0;
-      font-weight: 600;
     }
-    .items-table th.right { text-align: right; }
+    .items-table thead tr {
+      background: var(--light);
+    }
+    .items-table th {
+      padding: 9px 10px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--ink);
+      border: 1px solid var(--rule);
+      white-space: nowrap;
+    }
+    .items-table th.r { text-align: right; }
     .items-table td {
-      padding: 12px 14px;
-      border-bottom: 1px solid #f0f4f8;
-      font-size: 14px;
-      color: #333;
-      vertical-align: middle;
+      padding: 10px 10px;
+      border: 1px solid var(--rule);
+      vertical-align: top;
+      color: var(--body);
+      line-height: 1.55;
     }
-    .items-table td.right { text-align: right; }
-    .items-table tbody tr:last-child td { border-bottom: none; }
-    .items-table tbody tr:hover { background: #fafcff; }
+    .items-table td.r { text-align: right; font-variant-numeric: tabular-nums; }
+    .items-table td.c { text-align: center; }
+    .items-table td.num { text-align: center; }
 
-    .item-name { font-weight: 600; color: #1a2a3a; }
-    .item-desc { font-size: 12px; color: #888; margin-top: 2px; }
-
-    .qty-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 36px;
-      padding: 3px 10px;
-      background: #eef3f9;
-      color: #1a3a5c;
-      border-radius: 20px;
+    /* ── Totals ───────────────────────────────────── */
+    .totals {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+    .totals-table {
+      border-collapse: collapse;
+      font-size: 12px;
+      min-width: 260px;
+    }
+    .totals-table td {
+      padding: 5px 10px;
+      vertical-align: top;
+    }
+    .totals-table td:last-child {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .totals-table .sub-row td {
+      border-top: 1px solid var(--rule);
+      color: var(--body);
+    }
+    .totals-table .total-row td {
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
       font-weight: 700;
       font-size: 13px;
+      color: var(--ink);
+      padding-top: 7px;
+      padding-bottom: 7px;
     }
 
-    /* Notes */
-    .slip-notes {
-      background: #f7f9fc;
-      border-top: 1px solid #e2e8f0;
-      padding: 20px 28px;
+    /* ── Page footer rule ─────────────────────────── */
+    .page-rule {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin-top: 40px;
     }
-    .slip-notes h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #888; font-weight: 600; margin-bottom: 6px; }
-    .slip-notes p { font-size: 14px; color: #555; line-height: 1.6; }
+    .page-number {
+      text-align: right;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
 
-    /* Footer */
-    .slip-footer {
-      background: #1a3a5c;
-      color: rgba(255,255,255,0.7);
-      padding: 16px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+    /* ── Page 2 sections ──────────────────────────── */
+    .doc-section {
+      margin-bottom: 28px;
+    }
+    .doc-section h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .doc-section p {
+      font-size: 12px;
+      line-height: 1.75;
+      color: var(--body);
+    }
+
+    .auth-line {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 32px;
+      margin-top: 16px;
+      font-size: 12px;
+      align-items: end;
+    }
+    .auth-field {
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 4px;
+    }
+    .auth-field label {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 16px;
       font-size: 12px;
     }
-    .slip-footer strong { color: #fff; }
 
-    /* ── Email Modal ───────────────────────────────────── */
+    /* ── Email Modal ──────────────────────────────── */
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.45);
       z-index: 200;
       align-items: center;
       justify-content: center;
@@ -264,358 +312,423 @@
 
     .modal {
       background: #fff;
-      border-radius: 16px;
-      padding: 32px;
-      width: 100%;
-      max-width: 440px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-      animation: slideUp 0.2s ease;
-    }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-    .modal h2 { font-size: 20px; color: #1a3a5c; margin-bottom: 6px; }
-    .modal p { color: #666; font-size: 14px; margin-bottom: 20px; }
-
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 6px; }
-    .form-group input {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1.5px solid #d1dbe6;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #1a2a3a;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-    .form-group input:focus { border-color: #1a3a5c; }
-
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
-
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: #276749;
-      color: #fff;
-      padding: 12px 20px;
       border-radius: 10px;
-      font-weight: 600;
-      font-size: 14px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.3s;
-      z-index: 300;
+      padding: 28px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+      animation: rise 0.15s ease;
+    }
+    @keyframes rise { from { transform: translateY(14px); opacity: 0; } }
+
+    .modal h2 { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .modal .sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 5px; }
+    .field input {
+      width: 100%; padding: 9px 12px;
+      border: 1.5px solid var(--rule);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--ink);
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.12s;
+    }
+    .field input:focus { border-color: var(--red); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+    /* ── Toast ────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 20px; right: 20px;
+      background: #222; color: #fff;
+      padding: 11px 18px; border-radius: 8px;
+      font-size: 13px; font-weight: 600;
+      opacity: 0; transform: translateY(8px);
+      transition: all 0.22s; z-index: 400;
+      pointer-events: none;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.error { background: #c53030; }
+    .toast.ok  { background: #1a6644; }
+    .toast.err { background: var(--red); }
 
-    /* ── Print Styles ─────────────────────────────────── */
+    /* ── Print ────────────────────────────────────── */
     @media print {
-      body { background: #fff; }
-      #action-bar, #email-modal, .toast { display: none !important; }
-      #slip-wrapper { display: block !important; padding: 0; max-width: 100%; }
-      .slip { box-shadow: none; border-radius: 0; }
-      .slip-header { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-      .slip-footer { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      body { background: #fff; padding-top: 0; }
+      .action-bar, #email-modal, .toast { display: none !important; }
+      #loader, #error-state { display: none !important; }
+      #slip-wrapper { display: block !important; padding: 0; }
+      .page {
+        box-shadow: none;
+        max-width: 100%;
+        margin: 0;
+        padding: 32px 40px;
+        page-break-after: always;
+      }
+      .page:last-child { page-break-after: avoid; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Loader -->
-  <div id="loader">
-    <div class="spinner"></div>
-    <p style="color:#666;font-size:14px;">Loading package details…</p>
+<!-- ── Action Bar ──────────────────────────────────────── -->
+<div class="action-bar">
+  <div class="bar-brand">
+    <!-- Inline SurgiBox wordmark in red -->
+    <svg class="logo-svg" viewBox="0 0 140 40" xmlns="http://www.w3.org/2000/svg">
+      <!-- Box outline with S -->
+      <rect x="1" y="1" width="34" height="34" rx="2" fill="none" stroke="#C8102E" stroke-width="2.2"/>
+      <text x="8" y="26" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#C8102E">S</text>
+      <!-- "urgiBox" text -->
+      <text x="40" y="26" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="20" fill="#C8102E">urgiBox</text>
+      <text x="40" y="36" font-family="Arial, sans-serif" font-size="8" fill="#999" letter-spacing="0.5">®</text>
+    </svg>
+    <span class="bar-pkg">Package Slip &nbsp;·&nbsp; <strong id="bar-pkg-num">—</strong></span>
   </div>
+  <button class="btn btn-ghost" onclick="window.print()">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M4 5V2h8v3M3 11H1V7a1 1 0 011-1h12a1 1 0 011 1v4h-2M4 9h8v5H4z"/>
+    </svg>
+    Print / Save PDF
+  </button>
+  <button class="btn btn-red" onclick="openModal()">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+      <rect x="1" y="3" width="14" height="10" rx="1"/><polyline points="1,3 8,9 15,3"/>
+    </svg>
+    Email Customer
+  </button>
+</div>
 
-  <!-- Error -->
-  <div id="error-state">
-    <div class="error-icon">📦</div>
-    <h2>Package Not Found</h2>
-    <p id="error-msg">Unable to load package details. Please check the package ID and try again.</p>
-  </div>
+<!-- ── Loader ──────────────────────────────────────────── -->
+<div id="loader">
+  <div class="spinner"></div>
+  <p style="color:#666;font-size:13px;">Loading package details…</p>
+</div>
 
-  <!-- Action Bar -->
-  <div id="action-bar">
-    <span class="bar-title">📦 Package Slip</span>
-    <button class="btn btn-secondary" onclick="window.print()">
-      🖨️ Print / Save PDF
-    </button>
-    <button class="btn btn-success" onclick="openEmailModal()">
-      ✉️ Email Customer
-    </button>
-  </div>
+<!-- ── Error ───────────────────────────────────────────── -->
+<div id="error-state">
+  <h2>Package not found</h2>
+  <p id="error-msg">Could not load the package. Please check the package_id and try again.</p>
+</div>
 
-  <!-- Package Slip -->
-  <div id="slip-wrapper">
-    <div class="slip" id="package-slip">
-      <div class="slip-header">
-        <div class="slip-brand">
-          <h1>SurgiBox Inc.</h1>
-          <p>Advanced Surgical Solutions · Massachusetts, USA</p>
-        </div>
-        <div class="slip-badge">
-          <div class="label">Package Slip</div>
-          <div class="value" id="hdr-pkg-number">—</div>
-        </div>
+<!-- ── Slip pages ──────────────────────────────────────── -->
+<div id="slip-wrapper">
+
+  <!-- PAGE 1 -->
+  <div class="page" id="page-1">
+
+    <div class="doc-header">
+      <!-- SurgiBox Logo -->
+      <svg class="logo-svg" viewBox="0 0 160 52" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="42" height="42" rx="2.5" fill="none" stroke="#C8102E" stroke-width="2.8"/>
+        <text x="9" y="34" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="28" fill="#C8102E">S</text>
+        <text x="48" y="34" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="26" fill="#C8102E">urgiBox</text>
+        <text x="152" y="38" font-family="Arial, sans-serif" font-size="9" fill="#C8102E">®</text>
+      </svg>
+
+      <!-- Company address -->
+      <div class="company-address">
+        <strong>SurgiBox Inc</strong><br>
+        1035 Cambridge Street, C/O Geek Offices<br>
+        Cambridge Massachusetts<br>
+        U.S.A - 02141<br>
+        Email: sales@surgibox.com
       </div>
+    </div>
 
-      <div class="slip-meta">
-        <div class="meta-cell">
-          <div class="label">Package Date</div>
-          <div class="value" id="meta-date">—</div>
-        </div>
-        <div class="meta-cell">
-          <div class="label">Sales Order</div>
-          <div class="value" id="meta-so">—</div>
-        </div>
-        <div class="meta-cell">
-          <div class="label">Status</div>
-          <div class="value status">
-            <span class="status-dot"></span>
-            <span id="meta-status">—</span>
-          </div>
-        </div>
-        <div class="meta-cell">
-          <div class="label">Tracking #</div>
-          <div class="value" id="meta-tracking">—</div>
-        </div>
+    <!-- Bill To + Order Meta -->
+    <div class="doc-meta">
+      <div>
+        <div class="bill-to-label">Bill To</div>
+        <div class="bill-to-name" id="customer-name">—</div>
+        <div class="bill-to-address" id="billing-address">—</div>
       </div>
-
-      <div class="slip-addresses">
-        <div class="address-block">
-          <h3>Bill To</h3>
-          <div id="billing-address"><p>—</p></div>
-        </div>
-        <div class="address-block">
-          <h3>Ship To</h3>
-          <div id="shipping-address"><p>—</p></div>
-        </div>
-      </div>
-
-      <div class="slip-items">
-        <h3>Items Packed</h3>
-        <table class="items-table">
-          <thead>
-            <tr>
-              <th>Item / Description</th>
-              <th>SKU</th>
-              <th class="right">Qty</th>
-              <th>Unit</th>
-            </tr>
-          </thead>
-          <tbody id="items-body">
-            <tr><td colspan="4" style="text-align:center;color:#999;padding:24px;">No items</td></tr>
+      <div>
+        <table class="order-meta-table">
+          <tbody id="order-meta-rows">
+            <tr><td>Sales Order#</td><td id="meta-so">—</td></tr>
+            <tr><td>Order Date</td><td id="meta-date">—</td></tr>
+            <tr><td>Ref#</td><td id="meta-ref">—</td></tr>
+            <tr><td>Package#</td><td id="meta-pkg">—</td></tr>
           </tbody>
         </table>
       </div>
-
-      <div class="slip-notes" id="notes-section" style="display:none;">
-        <h3>Notes</h3>
-        <p id="notes-text"></p>
-      </div>
-
-      <div class="slip-footer">
-        <span>Thank you for choosing <strong>SurgiBox Inc.</strong></span>
-        <span id="footer-generated">Generated —</span>
-      </div>
     </div>
-  </div>
 
-  <!-- Email Modal -->
-  <div class="modal-overlay" id="email-modal" onclick="closeEmailModalOutside(event)">
-    <div class="modal">
-      <h2>✉️ Send Package Slip</h2>
-      <p>Send this package slip to the customer via email.</p>
-      <div class="form-group">
-        <label for="email-input">Recipient Email</label>
-        <input type="email" id="email-input" placeholder="customer@example.com" />
-      </div>
-      <div class="modal-actions">
-        <button class="btn btn-secondary" onclick="closeEmailModal()">Cancel</button>
-        <button class="btn btn-success" id="send-btn" onclick="sendEmail()">Send Email</button>
-      </div>
-    </div>
-  </div>
+    <!-- Items Table -->
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th style="width:28px;">#</th>
+          <th style="width:130px;">Item</th>
+          <th>Description</th>
+          <th style="width:80px;">HS Code</th>
+          <th style="width:80px;">Country of Origin</th>
+          <th style="width:60px;" class="r">Qty</th>
+          <th style="width:70px;" class="r">Rate</th>
+          <th style="width:80px;" class="r">Amount</th>
+        </tr>
+      </thead>
+      <tbody id="items-body">
+        <tr><td colspan="8" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
+      </tbody>
+    </table>
 
-  <div class="toast" id="toast"></div>
-
-  <script>
-    // ── Config ───────────────────────────────────────────
-    // The Catalyst function base URL will be filled in at deploy time.
-    // During local dev, use: http://localhost:3000
-    // After deploy, replace with your Catalyst function URL.
-    const API_BASE = window.CATALYST_API_BASE || "/__catalyst/api";
-
-    let currentPackageId = null;
-    let customerEmail = "";
-
-    // ── Helpers ──────────────────────────────────────────
-    function qs(id) { return document.getElementById(id); }
-
-    function showToast(msg, isError = false) {
-      const t = qs("toast");
-      t.textContent = msg;
-      t.className = "toast" + (isError ? " error" : "") + " show";
-      setTimeout(() => { t.className = "toast"; }, 3500);
-    }
-
-    function formatAddress(addr) {
-      if (!addr) return "<p>—</p>";
-      const parts = [
-        addr.attention ? `<strong>${addr.attention}</strong>` : "",
-        addr.address,
-        addr.street2,
-        [addr.city, addr.state, addr.zip].filter(Boolean).join(", "),
-        addr.country,
-      ].filter(Boolean);
-      return "<p>" + parts.join("<br>") + "</p>";
-    }
-
-    function formatDate(d) {
-      if (!d) return "—";
-      try {
-        return new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-      } catch { return d; }
-    }
-
-    function capitalize(s) {
-      return s ? s.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()) : "—";
-    }
-
-    // ── Load Package ─────────────────────────────────────
-    async function loadPackage(packageId) {
-      try {
-        const res = await fetch(`${API_BASE}/package?package_id=${encodeURIComponent(packageId)}`);
-        const json = await res.json();
-
-        if (!res.ok || !json.success) {
-          throw new Error(json.error || json.detail || "Failed to load package");
-        }
-
-        renderSlip(json.data);
-      } catch (err) {
-        qs("loader").style.display = "none";
-        const es = qs("error-state");
-        es.style.display = "flex";
-        qs("error-msg").textContent = err.message || "Unknown error";
-      }
-    }
-
-    function renderSlip({ package: pkg, salesOrder: so, contact }) {
-      // Header
-      qs("hdr-pkg-number").textContent = pkg.package_number || "—";
-
-      // Meta
-      qs("meta-date").textContent = formatDate(pkg.date);
-      qs("meta-so").textContent = so.salesorder_number || "—";
-      qs("meta-status").textContent = capitalize(pkg.status || so.order_status || "packed");
-      qs("meta-tracking").textContent = pkg.tracking_number || so.reference_number || "—";
-
-      // Addresses
-      const billing  = so.billing_address || contact.billing_address || {};
-      const shipping = so.shipping_address || contact.shipping_address || {};
-      qs("billing-address").innerHTML  = formatAddress({ ...billing,  attention: contact.contact_name });
-      qs("shipping-address").innerHTML = formatAddress({ ...shipping, attention: contact.contact_name });
-
-      // Items
-      const items = pkg.line_items || [];
-      if (items.length) {
-        qs("items-body").innerHTML = items.map(li => `
-          <tr>
-            <td>
-              <div class="item-name">${li.name || li.description || "—"}</div>
-              ${li.description && li.name ? `<div class="item-desc">${li.description}</div>` : ""}
-            </td>
-            <td style="color:#888;font-size:13px;">${li.sku || "—"}</td>
-            <td class="right"><span class="qty-badge">${li.quantity}</span></td>
-            <td style="color:#666;">${li.unit || "pcs"}</td>
+    <!-- Totals -->
+    <div class="totals">
+      <table class="totals-table">
+        <tbody>
+          <tr class="sub-row">
+            <td>Sub Total</td>
+            <td id="subtotal">—</td>
           </tr>
-        `).join("");
-      }
+          <tr>
+            <td colspan="2" style="padding:4px 0;"></td>
+          </tr>
+          <tr class="total-row">
+            <td>Total</td>
+            <td id="total">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      // Notes
-      if (pkg.notes || so.notes) {
-        qs("notes-text").textContent = pkg.notes || so.notes;
-        qs("notes-section").style.display = "block";
-      }
+    <hr class="page-rule">
+    <div class="page-number">1</div>
+  </div>
 
-      // Footer
-      qs("footer-generated").textContent = `Generated ${new Date().toLocaleDateString("en-US", { dateStyle: "long" })}`;
+  <!-- PAGE 2 -->
+  <div class="page" id="page-2">
 
-      // Pre-fill email
-      customerEmail = contact.email ||
-        (contact.contact_persons || []).find(p => p.email)?.email || "";
-      qs("email-input").value = customerEmail;
+    <div class="doc-section">
+      <h3>Payment Information (If Applicable)</h3>
+      <p>
+        Bank Name: Eastern Bank &nbsp;&nbsp; Account Name: SurgiBox Inc. &nbsp;&nbsp;
+        Account Number: 2995492383 &nbsp;&nbsp; SWIFT/BIC: EASRUS3B<br>
+        Beneficiary Account: 2995492383 &nbsp;&nbsp; Beneficiary Name: SURGIBOX INC &nbsp;&nbsp;
+        Account Type: Cash Management Checking
+      </p>
+    </div>
 
-      // Show UI
-      qs("loader").style.display = "none";
-      qs("action-bar").style.display = "flex";
-      qs("slip-wrapper").style.display = "block";
+    <div class="doc-section">
+      <h3>Customs Declaration:</h3>
+      <p>
+        "I/We hereby certify that the information on this invoice is true and correct and that the contents of this shipment are as stated above."
+      </p>
+      <p style="margin-top:8px;">
+        For Non-Commercial Shipments: "Value for Customs purposes only. No charge to consignee. Goods are for [demonstration/humanitarian] use and will not be resold."
+      </p>
+    </div>
+
+    <div class="doc-section">
+      <h3>Authorization</h3>
+      <div class="auth-line">
+        <div class="auth-field">
+          <label>Authorized Signature:</label>
+          &nbsp;
+        </div>
+        <div class="auth-field">
+          <label>Name/Title:</label>
+          &nbsp;
+        </div>
+        <div style="font-size:12px;white-space:nowrap;padding-bottom:4px;">
+          Date: <span id="auth-date">—</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="page-rule">
+    <div class="page-number">2</div>
+  </div>
+
+</div><!-- /#slip-wrapper -->
+
+<!-- ── Email Modal ─────────────────────────────────────── -->
+<div class="modal-overlay" id="email-modal" onclick="outsideClose(event)">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h2>Email Package Slip</h2>
+    <p class="sub">Sends this package slip directly to the customer.</p>
+    <div class="field">
+      <label>Recipient Email</label>
+      <input type="email" id="email-to" placeholder="customer@example.com" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-red" id="send-btn" onclick="sendEmail()">Send Email</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  // ── Config ─────────────────────────────────────────────
+  // Set by catalyst.config.js at deploy time; falls back to proxy path
+  const API_BASE = (typeof window.CATALYST_API_BASE !== 'undefined')
+    ? window.CATALYST_API_BASE
+    : '/api';
+
+  let currentPackageId = null;
+
+  // ── Helpers ────────────────────────────────────────────
+  function $id(id) { return document.getElementById(id); }
+
+  function fmt(n) {
+    if (n == null || n === '') return '—';
+    const num = parseFloat(n);
+    if (isNaN(num)) return n;
+    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function fmtDate(d) {
+    if (!d) return '—';
+    try {
+      return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch { return d; }
+  }
+
+  function buildAddress(addr, fallback) {
+    if (!addr) return fallback || '—';
+    const parts = [
+      addr.address, addr.street2,
+      [addr.city, addr.state, addr.zip].filter(Boolean).join(' '),
+      addr.country
+    ].filter(Boolean);
+    return parts.join('\n');
+  }
+
+  function toast(msg, type = '') {
+    const t = $id('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => { t.className = 'toast'; }, 3400);
+  }
+
+  // ── Render ─────────────────────────────────────────────
+  function render({ package: pkg, salesOrder: so, contact }) {
+    // Action bar
+    $id('bar-pkg-num').textContent = pkg.package_number || '—';
+
+    // Order meta
+    $id('meta-so').textContent   = so.salesorder_number || '—';
+    $id('meta-date').textContent = fmtDate(so.date || pkg.date);
+    $id('meta-ref').textContent  = so.reference_number || pkg.shipment_order?.tracking_number || '—';
+    $id('meta-pkg').textContent  = pkg.package_number || '—';
+
+    // Auth date
+    $id('auth-date').textContent = fmtDate(so.date || pkg.date);
+
+    // Customer
+    $id('customer-name').textContent = contact.contact_name || so.customer_name || '—';
+    const billAddr = so.billing_address || contact.billing_address || {};
+    $id('billing-address').innerHTML = buildAddress(billAddr).replace(/\n/g, '<br>');
+
+    // Items
+    const items = pkg.line_items || [];
+    if (items.length) {
+      // Compute totals from SO line items keyed by so_line_item_id
+      const soItems = {};
+      (so.line_items || []).forEach(li => { soItems[li.line_item_id] = li; });
+
+      let subtotalSum = 0;
+
+      $id('items-body').innerHTML = items.map((li, i) => {
+        const soLi = soItems[li.so_line_item_id] || {};
+        const rate   = soLi.rate   != null ? soLi.rate   : li.rate;
+        const qty    = li.quantity != null ? li.quantity : soLi.quantity;
+        const amount = rate != null && qty != null ? parseFloat(rate) * parseFloat(qty) : soLi.item_total;
+        const hs     = soLi.hsn_or_sac || li.hsn_or_sac || '';
+        const origin = soLi.custom_fields?.find(f => f.label?.toLowerCase().includes('origin'))?.value
+                    || li.country_of_origin || '';
+        const desc   = soLi.description || li.description || '';
+        if (amount) subtotalSum += parseFloat(amount) || 0;
+
+        return `<tr>
+          <td class="num">${i + 1}</td>
+          <td>${li.name || soLi.name || '—'}</td>
+          <td style="font-size:11.5px;">${desc || '—'}</td>
+          <td class="c">${hs || '—'}</td>
+          <td class="c">${origin || '—'}</td>
+          <td class="r">${fmt(qty)}<br><span style="color:#888;font-size:10.5px;">${soLi.unit || li.unit || ''}</span></td>
+          <td class="r">${rate != null ? fmt(rate) : '—'}</td>
+          <td class="r">${amount != null ? fmt(amount) : '—'}</td>
+        </tr>`;
+      }).join('');
+
+      const total = so.total || subtotalSum;
+      $id('subtotal').textContent = fmt(so.sub_total || subtotalSum);
+      $id('total').textContent    = '$' + fmt(total);
     }
 
-    // ── Email Modal ──────────────────────────────────────
-    function openEmailModal() {
-      qs("email-modal").classList.add("open");
+    // Email pre-fill
+    const email = contact.email
+      || (contact.contact_persons || []).find(p => p.email)?.email || '';
+    $id('email-to').value = email;
+
+    // Show
+    $id('loader').style.display = 'none';
+    $id('slip-wrapper').style.display = 'block';
+  }
+
+  // ── Load ───────────────────────────────────────────────
+  async function load(packageId) {
+    try {
+      const res  = await fetch(`${API_BASE}/package?package_id=${encodeURIComponent(packageId)}`);
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || json.detail || 'Failed to load');
+      render(json.data);
+    } catch (err) {
+      $id('loader').style.display = 'none';
+      const es = $id('error-state');
+      es.style.display = 'flex';
+      $id('error-msg').textContent = err.message;
     }
-    function closeEmailModal() {
-      qs("email-modal").classList.remove("open");
+  }
+
+  // ── Email ──────────────────────────────────────────────
+  function openModal()  { $id('email-modal').classList.add('open'); $id('email-to').focus(); }
+  function closeModal() { $id('email-modal').classList.remove('open'); }
+  function outsideClose(e) { if (e.target === $id('email-modal')) closeModal(); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  async function sendEmail() {
+    const email = $id('email-to').value.trim();
+    if (!email || !email.includes('@')) { toast('Enter a valid email address', 'err'); return; }
+    const btn = $id('send-btn');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+      const res  = await fetch(`${API_BASE}/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ package_id: currentPackageId, email }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || 'Failed to send');
+      closeModal();
+      toast('Sent to ' + (json.sent_to || email), 'ok');
+    } catch (err) {
+      toast(err.message || 'Failed to send email', 'err');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Send Email';
     }
-    function closeEmailModalOutside(e) {
-      if (e.target === qs("email-modal")) closeEmailModal();
+  }
+
+  // ── Init ───────────────────────────────────────────────
+  (function init() {
+    const params = new URLSearchParams(window.location.search);
+    currentPackageId = params.get('package_id') || params.get('id');
+    if (!currentPackageId) {
+      $id('loader').style.display = 'none';
+      $id('error-state').style.display = 'flex';
+      $id('error-msg').textContent = 'No package_id in URL. Use ?package_id=YOUR_ID';
+      return;
     }
-
-    async function sendEmail() {
-      const email = qs("email-input").value.trim();
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showToast("Please enter a valid email address", true);
-        return;
-      }
-
-      const btn = qs("send-btn");
-      btn.disabled = true;
-      btn.textContent = "Sending…";
-
-      try {
-        const res = await fetch(`${API_BASE}/send-email`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ package_id: currentPackageId, email }),
-        });
-        const json = await res.json();
-
-        if (!res.ok || !json.success) {
-          throw new Error(json.error || json.detail || "Failed to send email");
-        }
-
-        closeEmailModal();
-        showToast(`✅ Email sent to ${json.sent_to}`);
-      } catch (err) {
-        showToast(err.message || "Failed to send email", true);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Send Email";
-      }
-    }
-
-    // ── Init ─────────────────────────────────────────────
-    (function init() {
-      const params = new URLSearchParams(window.location.search);
-      currentPackageId = params.get("package_id") || params.get("id");
-
-      if (!currentPackageId) {
-        qs("loader").style.display = "none";
-        const es = qs("error-state");
-        es.style.display = "flex";
-        qs("error-msg").textContent =
-          "No package ID provided. Use ?package_id=YOUR_ID in the URL.";
-        return;
-      }
-
-      loadPackage(currentPackageId);
-    })();
-  </script>
+    load(currentPackageId);
+  })();
+</script>
 </body>
 </html>
