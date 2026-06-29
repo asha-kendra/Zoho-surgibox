@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" width="240" height="80">
+  <!-- Top-right L bracket -->
+  <path d="M 160,14 L 456,14 Q 466,14 466,24 L 466,90"
+        fill="none" stroke="#C8102E" stroke-width="14"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Bottom-left U bracket -->
+  <path d="M 14,72 L 14,138 Q 14,148 24,148 L 456,148 Q 466,148 466,138 L 466,108"
+        fill="none" stroke="#C8102E" stroke-width="14"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- SurgiBox text — "Surgi" part -->
+  <text x="30" y="118"
+        font-family="'Arial Black','Arial',sans-serif"
+        font-weight="900" font-size="72" fill="#C8102E"
+        letter-spacing="-1">Surgi</text>
+
+  <!-- Building/house icon replacing the dot of "i" -->
+  <!-- The "i" dot is approximately at x=226, y=38 -->
+  <g transform="translate(222,22)">
+    <!-- House body -->
+    <rect x="2" y="12" width="20" height="14" fill="#C8102E"/>
+    <!-- Roof -->
+    <polygon points="0,13 12,2 24,13" fill="#C8102E"/>
+    <!-- Door -->
+    <rect x="8" y="18" width="8" height="8" fill="white"/>
+  </g>
+
+  <!-- "Box" part -->
+  <text x="248" y="118"
+        font-family="'Arial Black','Arial',sans-serif"
+        font-weight="900" font-size="72" fill="#C8102E"
+        letter-spacing="-1">Box</text>
+
+  <!-- Registered trademark -->
+  <text x="458" y="38"
+        font-family="Arial,sans-serif"
+        font-size="18" fill="#C8102E">®</text>
+</svg>
