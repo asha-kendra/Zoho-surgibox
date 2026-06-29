@@ -1,5 +1,5 @@
-const https = require("https");
-const { URLSearchParams } = require("url");
+import https from "https";
+import { URLSearchParams } from "url";
 
 const ORG_ID = "921165551";
 
@@ -15,7 +15,7 @@ function httpsPost(hostname, path, data, headers = {}) {
         let raw = "";
         res.on("data", (c) => (raw += c));
         res.on("end", () => {
-          try { resolve(JSON.parse(raw)); } catch { resolve(raw); }
+          try { resolve(JSON.parse(raw)); } catch (e) { resolve(raw); }
         });
       }
     );
@@ -31,7 +31,7 @@ function httpsGet(hostname, path, headers = {}) {
       let raw = "";
       res.on("data", (c) => (raw += c));
       res.on("end", () => {
-        try { resolve(JSON.parse(raw)); } catch { resolve(raw); }
+        try { resolve(JSON.parse(raw)); } catch (e) { resolve(raw); }
       });
     });
     req.on("error", reject);
@@ -100,7 +100,7 @@ function setCORS(response) {
   response.set("Access-Control-Allow-Headers", "Content-Type");
 }
 
-module.exports = async (context, request, response) => {
+export default async function handler(context, request, response) {
   setCORS(response);
 
   if (request.method === "OPTIONS") {
@@ -145,4 +145,4 @@ module.exports = async (context, request, response) => {
     console.error("Function error:", err.message);
     return response.status(500).json({ error: "Internal error", detail: err.message });
   }
-};
+}
