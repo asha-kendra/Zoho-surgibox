@@ -669,7 +669,7 @@
     $id('ship-name').textContent = customerName;
 
     const billAddr = so.billing_address  || contact.billing_address  || {};
-    const shipAddr = so.shipping_address || contact.shipping_address || {};
+    const shipAddr = so.shipping_address || contact.shipping_address || billAddr;
     $id('billing-address').innerHTML  = buildAddress(billAddr).replace(/\n/g, '<br>');
     $id('shipping-address').innerHTML = buildAddress(shipAddr).replace(/\n/g, '<br>');
 
