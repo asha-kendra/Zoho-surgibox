@@ -477,29 +477,21 @@
       </div>
     </div>
 
-    <!-- Package Details -->
-    <table class="items-table" id="pkg-details-table" style="margin-bottom:0;border-bottom:none;">
+    <!-- Combined Package Details + Items Table -->
+    <table class="items-table">
       <thead>
         <tr>
-          <th>Package Dimensions (L × W × H)</th>
-          <th>Net Weight</th>
-          <th>Gross Weight</th>
-          <th>Carrier</th>
+          <th colspan="4" style="background:var(--light);">Package Dimensions (L × W × H)</th>
+          <th style="background:var(--light);">Net Weight</th>
+          <th style="background:var(--light);">Gross Weight</th>
+          <th colspan="4" style="background:var(--light);">Carrier</th>
         </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td id="pkg-dimensions">—</td>
-          <td id="pkg-net-weight">—</td>
-          <td id="pkg-gross-weight">—</td>
-          <td id="pkg-carrier">—</td>
+        <tr id="pkg-details-row">
+          <td colspan="4" id="pkg-dimensions" style="border:1px solid var(--rule);padding:8px 10px;">—</td>
+          <td id="pkg-net-weight" style="border:1px solid var(--rule);padding:8px 10px;">—</td>
+          <td id="pkg-gross-weight" style="border:1px solid var(--rule);padding:8px 10px;">—</td>
+          <td colspan="4" id="pkg-carrier" style="border:1px solid var(--rule);padding:8px 10px;">—</td>
         </tr>
-      </tbody>
-    </table>
-
-    <!-- Items Table -->
-    <table class="items-table" style="margin-top:-1px;">
-      <thead>
         <tr>
           <th style="width:28px;">#</th>
           <th style="width:120px;">Item</th>
@@ -514,7 +506,7 @@
         </tr>
       </thead>
       <tbody id="items-body">
-        <tr><td colspan="9" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
+        <tr><td colspan="10" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
       </tbody>
     </table>
 
