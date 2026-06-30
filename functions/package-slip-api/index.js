@@ -111,8 +111,8 @@ app.use((req, res, next) => {
 
 app.use(async (req, res) => {
   const url = req.originalUrl || req.url || "";
-  const isPackage = req.method === "GET" && (url.includes("package") || url === "/");
-  const isEmail = req.method === "POST" && (url.includes("send-email") || url === "/");
+  const isPackage = req.method === "GET" && url.includes("package") && !url.includes("send-email");
+  const isEmail = req.method === "GET" && url.includes("send-email");
 
   if (isPackage) {
     const packageId = req.query.package_id;
@@ -129,13 +129,13 @@ app.use(async (req, res) => {
   }
 
   if (isEmail) {
-    const packageId = (req.body || {}).package_id;
+    const packageId = req.query.package_id;
     if (!packageId) return res.status(400).json({ error: "package_id is required" });
     try {
       const pkg = await getPackageDetails(packageId);
       const so = await getSalesOrder(pkg.salesorder_id);
       const contact = await getContact(so.customer_id);
-      const toEmail = req.body.email || contact.email ||
+      const toEmail = req.query.email || contact.email ||
         (contact.contact_persons || []).find((p) => p.email)?.email;
       if (!toEmail) return res.status(400).json({ error: "No customer email found" });
       await sendPackageSlipEmail(pkg, so, contact, toEmail);

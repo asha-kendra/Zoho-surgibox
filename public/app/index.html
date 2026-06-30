@@ -767,11 +767,7 @@
     const btn = $id('send-btn');
     btn.disabled = true; btn.textContent = 'Sending…';
     try {
-      const res  = await fetch(`${API_BASE}/send-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ package_id: currentPackageId, email }),
-      });
+      const res  = await fetch(`${API_BASE}/send-email?package_id=${encodeURIComponent(currentPackageId)}&email=${encodeURIComponent(email)}`);
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || 'Failed to send');
       closeModal();
