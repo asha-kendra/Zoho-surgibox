@@ -85,7 +85,9 @@ async function getContact(contactId) {
 async function sendPackageSlipEmail(pkg, so, contact, toEmail) {
   const token = await getAccessToken();
   const body = JSON.stringify({
+    send_from_org_email_id: false,
     to_mail_ids: [toEmail],
+    cc_mail_ids: [],
     subject: `Your SurgiBox Package Slip – ${pkg.package_number}`,
     body: `<p>Dear ${contact.contact_name || "Customer"},</p><p>Package slip for order <strong>${so.salesorder_number}</strong> is attached.</p>`,
   });
