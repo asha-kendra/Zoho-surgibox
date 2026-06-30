@@ -94,9 +94,8 @@ async function sendPackageSlipEmail(pkg, so, contact, toEmail) {
   });
 }
 
-module.exports = async (context, basicIO) => {
-  const request = basicIO.getReq();
-  const response = basicIO.getRes();
+module.exports = async (context, request) => {
+  const response = request.res;
 
   response.set("Access-Control-Allow-Origin", "*");
   response.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
