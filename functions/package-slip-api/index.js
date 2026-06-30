@@ -88,13 +88,17 @@ async function sendPackageSlipEmail(pkg, so, contact, toEmail) {
     to_mail_ids: [toEmail],
     subject: `Your SurgiBox Package Slip – ${pkg.package_number}`,
     body: `<p>Dear ${contact.contact_name || "Customer"},</p><p>Package slip for order <strong>${so.salesorder_number}</strong> is attached.</p>`,
-    send_from_org_email_id: false,
   });
   const path = `/inventory/v1/salesorders/${so.salesorder_id}/packages/${pkg.package_id}/emails?organization_id=${ORG_ID}`;
-  return httpsPost("www.zohoapis.com", path, body, {
+  const result = await httpsPost("www.zohoapis.com", path, body, {
     Authorization: `Zoho-oauthtoken ${token}`,
     "Content-Type": "application/json",
   });
+  console.log("Zoho email API response:", JSON.stringify(result));
+  if (result.code !== 0) {
+    throw new Error(`Zoho email API error: ${result.message || JSON.stringify(result)}`);
+  }
+  return result;
 }
 
 const express = require("express");
