@@ -66,16 +66,19 @@ async function zohoGet(path) {
 
 async function getPackageDetails(packageId) {
   const data = await zohoGet(`/packages/${packageId}`);
+  if (!data.package) throw new Error(`Package not found: ${packageId} — API: ${JSON.stringify(data).slice(0, 200)}`);
   return data.package;
 }
 
 async function getSalesOrder(salesorderId) {
   const data = await zohoGet(`/salesorders/${salesorderId}`);
+  if (!data.salesorder) throw new Error(`Sales order not found: ${salesorderId}`);
   return data.salesorder;
 }
 
 async function getContact(contactId) {
   const data = await zohoGet(`/contacts/${contactId}`);
+  if (!data.contact) throw new Error(`Contact not found: ${contactId}`);
   return data.contact;
 }
 
