@@ -106,36 +106,44 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get(["/package", "/api/package"], async (req, res) => {
-  const packageId = req.query.package_id;
-  if (!packageId) return res.status(400).json({ error: "package_id is required" });
-  try {
-    const pkg = await getPackageDetails(packageId);
-    const so = await getSalesOrder(pkg.salesorder_id);
-    const contact = await getContact(so.customer_id);
-    return res.status(200).json({ success: true, data: { package: pkg, salesOrder: so, contact } });
-  } catch (err) {
-    console.error(err.message);
-    return res.status(500).json({ error: "Internal error", detail: err.message });
-  }
-});
+app.use("*", async (req, res) => {
+  const url = req.originalUrl || req.url || "";
+  const isPackage = req.method === "GET" && (url.includes("package") || url === "/");
+  const isEmail = req.method === "POST" && (url.includes("send-email") || url === "/");
 
-app.post(["/send-email", "/api/send-email"], async (req, res) => {
-  const packageId = (req.body || {}).package_id;
-  if (!packageId) return res.status(400).json({ error: "package_id is required" });
-  try {
-    const pkg = await getPackageDetails(packageId);
-    const so = await getSalesOrder(pkg.salesorder_id);
-    const contact = await getContact(so.customer_id);
-    const toEmail = req.body.email || contact.email ||
-      (contact.contact_persons || []).find((p) => p.email)?.email;
-    if (!toEmail) return res.status(400).json({ error: "No customer email found" });
-    await sendPackageSlipEmail(pkg, so, contact, toEmail);
-    return res.status(200).json({ success: true, sent_to: toEmail });
-  } catch (err) {
-    console.error(err.message);
-    return res.status(500).json({ error: "Internal error", detail: err.message });
+  if (isPackage) {
+    const packageId = req.query.package_id;
+    if (!packageId) return res.status(400).json({ error: "package_id is required" });
+    try {
+      const pkg = await getPackageDetails(packageId);
+      const so = await getSalesOrder(pkg.salesorder_id);
+      const contact = await getContact(so.customer_id);
+      return res.status(200).json({ success: true, data: { package: pkg, salesOrder: so, contact } });
+    } catch (err) {
+      console.error(err.message);
+      return res.status(500).json({ error: "Internal error", detail: err.message });
+    }
   }
+
+  if (isEmail) {
+    const packageId = (req.body || {}).package_id;
+    if (!packageId) return res.status(400).json({ error: "package_id is required" });
+    try {
+      const pkg = await getPackageDetails(packageId);
+      const so = await getSalesOrder(pkg.salesorder_id);
+      const contact = await getContact(so.customer_id);
+      const toEmail = req.body.email || contact.email ||
+        (contact.contact_persons || []).find((p) => p.email)?.email;
+      if (!toEmail) return res.status(400).json({ error: "No customer email found" });
+      await sendPackageSlipEmail(pkg, so, contact, toEmail);
+      return res.status(200).json({ success: true, sent_to: toEmail });
+    } catch (err) {
+      console.error(err.message);
+      return res.status(500).json({ error: "Internal error", detail: err.message });
+    }
+  }
+
+  return res.status(404).json({ error: "Route not found", method: req.method, url });
 });
 
 module.exports = app;
