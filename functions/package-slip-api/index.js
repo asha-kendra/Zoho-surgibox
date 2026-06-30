@@ -1,5 +1,5 @@
-import https from "https";
-import { URLSearchParams } from "url";
+const https = require("https");
+const { URLSearchParams } = require("url");
 
 const ORG_ID = "921165551";
 
@@ -100,7 +100,7 @@ function setCORS(response) {
   response.set("Access-Control-Allow-Headers", "Content-Type");
 }
 
-export default async function handler(context, request, response) {
+module.exports = async (context, request, response) => {
   setCORS(response);
 
   if (request.method === "OPTIONS") {
@@ -145,4 +145,4 @@ export default async function handler(context, request, response) {
     console.error("Function error:", err.message);
     return response.status(500).json({ error: "Internal error", detail: err.message });
   }
-}
+};
