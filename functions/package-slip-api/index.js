@@ -106,7 +106,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("*", async (req, res) => {
+app.use(async (req, res) => {
   const url = req.originalUrl || req.url || "";
   const isPackage = req.method === "GET" && (url.includes("package") || url === "/");
   const isEmail = req.method === "POST" && (url.includes("send-email") || url === "/");
