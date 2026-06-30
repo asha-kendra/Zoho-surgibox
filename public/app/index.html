@@ -481,9 +481,7 @@
     <table id="pkg-details-table" style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12px;">
       <thead>
         <tr style="background:var(--light);">
-          <th style="padding:8px 10px;text-align:left;font-weight:700;color:var(--ink);border:1px solid var(--rule);">Length</th>
-          <th style="padding:8px 10px;text-align:left;font-weight:700;color:var(--ink);border:1px solid var(--rule);">Width</th>
-          <th style="padding:8px 10px;text-align:left;font-weight:700;color:var(--ink);border:1px solid var(--rule);">Height</th>
+          <th style="padding:8px 10px;text-align:left;font-weight:700;color:var(--ink);border:1px solid var(--rule);">Package Dimensions (L × W × H)</th>
           <th style="padding:8px 10px;text-align:left;font-weight:700;color:var(--ink);border:1px solid var(--rule);">Net Weight</th>
           <th style="padding:8px 10px;text-align:left;font-weight:700;color:var(--ink);border:1px solid var(--rule);">Gross Weight</th>
           <th style="padding:8px 10px;text-align:left;font-weight:700;color:var(--ink);border:1px solid var(--rule);">Carrier</th>
@@ -491,9 +489,7 @@
       </thead>
       <tbody>
         <tr>
-          <td id="pkg-length" style="padding:8px 10px;border:1px solid var(--rule);color:var(--body);">—</td>
-          <td id="pkg-width"  style="padding:8px 10px;border:1px solid var(--rule);color:var(--body);">—</td>
-          <td id="pkg-height" style="padding:8px 10px;border:1px solid var(--rule);color:var(--body);">—</td>
+          <td id="pkg-dimensions" style="padding:8px 10px;border:1px solid var(--rule);color:var(--body);">—</td>
           <td id="pkg-net-weight"   style="padding:8px 10px;border:1px solid var(--rule);color:var(--body);">—</td>
           <td id="pkg-gross-weight" style="padding:8px 10px;border:1px solid var(--rule);color:var(--body);">—</td>
           <td id="pkg-carrier"      style="padding:8px 10px;border:1px solid var(--rule);color:var(--body);">—</td>
@@ -507,6 +503,7 @@
         <tr>
           <th style="width:28px;">#</th>
           <th style="width:120px;">Item</th>
+          <th style="width:90px;">SKU</th>
           <th>Description</th>
           <th style="width:72px;">HS Code</th>
           <th style="width:72px;">Country of Origin</th>
@@ -517,7 +514,7 @@
         </tr>
       </thead>
       <tbody id="items-body">
-        <tr><td colspan="8" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
+        <tr><td colspan="9" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
       </tbody>
     </table>
 
@@ -702,6 +699,7 @@
         return `<tr>
           <td class="num">${i + 1}</td>
           <td>${li.name || soLi.name || '—'}</td>
+          <td style="color:#555;">${li.sku || soLi.sku || '—'}</td>
           <td style="font-size:11.5px;">${desc || '—'}</td>
           <td class="c">${hs || '—'}</td>
           <td class="c">${origin || '—'}</td>
@@ -722,11 +720,11 @@
     const wt   = pkg.weight || {};
     const unit = dim.unit || 'cm';
     const wunit = wt.unit || 'kg';
-    const fmtDim = (v) => (v != null && v !== 0 && v !== '0') ? `${v} ${unit}` : '—';
     const fmtWt  = (v) => (v != null && v !== 0 && v !== '0') ? `${v} ${wunit}` : '—';
-    $id('pkg-length').textContent      = fmtDim(dim.length);
-    $id('pkg-width').textContent       = fmtDim(dim.width);
-    $id('pkg-height').textContent      = fmtDim(dim.height);
+    const hasD = (v) => v != null && v !== 0 && v !== '0';
+    $id('pkg-dimensions').textContent = (hasD(dim.length) || hasD(dim.width) || hasD(dim.height))
+      ? `${dim.length || 0} × ${dim.width || 0} × ${dim.height || 0} ${unit}`
+      : '—';
     $id('pkg-net-weight').textContent  = fmtWt(wt.net_weight);
     $id('pkg-gross-weight').textContent = fmtWt(wt.gross_weight);
     $id('pkg-carrier').textContent      = pkg.carrier || pkg.delivery_method || '—';
