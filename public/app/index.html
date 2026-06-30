@@ -679,6 +679,7 @@
       const soItems = {};
       (so.line_items || []).forEach(li => { soItems[li.line_item_id] = li; });
 
+      const sym = so.currency_symbol || '$';
       let subtotalSum = 0;
 
       $id('items-body').innerHTML = items.map((li, i) => {
@@ -704,15 +705,15 @@
           <td class="c">${hs || '—'}</td>
           <td class="c">${origin || '—'}</td>
           <td class="r">${fmt(qty)}<br><span style="color:#888;font-size:10.5px;">${soLi.unit || li.unit || ''}</span></td>
-          <td class="r">${rate != null ? fmt(rate) : '—'}</td>
-          <td class="r">${disc != null && disc > 0 ? fmt(disc) : '—'}</td>
-          <td class="r">${amount != null ? fmt(amount) : '—'}</td>
+          <td class="r">${rate != null ? sym + fmt(rate) : '—'}</td>
+          <td class="r">${disc != null && disc > 0 ? sym + fmt(disc) : '—'}</td>
+          <td class="r">${amount != null ? sym + fmt(amount) : '—'}</td>
         </tr>`;
       }).join('');
 
       const total = so.total || subtotalSum;
-      $id('subtotal').textContent = fmt(so.sub_total || subtotalSum);
-      $id('total').textContent    = '$' + fmt(total);
+      $id('subtotal').textContent = sym + fmt(so.sub_total || subtotalSum);
+      $id('total').textContent    = sym + fmt(total);
     }
 
     // Package dimensions & weight
