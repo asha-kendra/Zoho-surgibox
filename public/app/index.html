@@ -486,6 +486,7 @@
           <th style="padding:8px 10px;text-align:left;font-weight:700;color:var(--ink);border:1px solid var(--rule);">Height</th>
           <th style="padding:8px 10px;text-align:left;font-weight:700;color:var(--ink);border:1px solid var(--rule);">Net Weight</th>
           <th style="padding:8px 10px;text-align:left;font-weight:700;color:var(--ink);border:1px solid var(--rule);">Gross Weight</th>
+          <th style="padding:8px 10px;text-align:left;font-weight:700;color:var(--ink);border:1px solid var(--rule);">Carrier</th>
         </tr>
       </thead>
       <tbody>
@@ -495,6 +496,7 @@
           <td id="pkg-height" style="padding:8px 10px;border:1px solid var(--rule);color:var(--body);">—</td>
           <td id="pkg-net-weight"   style="padding:8px 10px;border:1px solid var(--rule);color:var(--body);">—</td>
           <td id="pkg-gross-weight" style="padding:8px 10px;border:1px solid var(--rule);color:var(--body);">—</td>
+          <td id="pkg-carrier"      style="padding:8px 10px;border:1px solid var(--rule);color:var(--body);">—</td>
         </tr>
       </tbody>
     </table>
@@ -727,6 +729,7 @@
     $id('pkg-height').textContent      = fmtDim(dim.height);
     $id('pkg-net-weight').textContent  = fmtWt(wt.net_weight);
     $id('pkg-gross-weight').textContent = fmtWt(wt.gross_weight);
+    $id('pkg-carrier').textContent      = pkg.carrier || pkg.delivery_method || '—';
 
     // Email pre-fill
     const email = contact.email
