@@ -94,14 +94,13 @@ async function sendPackageSlipEmail(pkg, so, contact, toEmail) {
   });
 }
 
-function setCORS(response) {
+module.exports = async (context, basicIO) => {
+  const request = basicIO.getReq();
+  const response = basicIO.getRes();
+
   response.set("Access-Control-Allow-Origin", "*");
   response.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   response.set("Access-Control-Allow-Headers", "Content-Type");
-}
-
-module.exports = async (context, request, response) => {
-  setCORS(response);
 
   if (request.method === "OPTIONS") {
     return response.status(204).send("");
