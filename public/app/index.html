@@ -146,7 +146,7 @@
     /* ── Bill To / Ship To / Order Meta ───────────── */
     .doc-meta {
       display: grid;
-      grid-template-columns: 1fr 1fr auto;
+      grid-template-columns: 1fr 1fr;
       gap: 24px;
       margin-bottom: 28px;
       align-items: start;
@@ -171,21 +171,25 @@
       color: var(--body);
     }
     .order-meta-table {
+      width: 100%;
       border-collapse: collapse;
       font-size: 12px;
+      margin-top: 16px;
     }
-    .order-meta-table td {
-      padding: 3px 0;
-      vertical-align: top;
-    }
-    .order-meta-table td:first-child {
+    .order-meta-table th {
+      background: var(--light);
       font-weight: 700;
       color: var(--ink);
-      padding-right: 24px;
+      padding: 6px 10px;
+      border: 1px solid var(--rule);
+      text-align: left;
       white-space: nowrap;
     }
-    .order-meta-table td:last-child {
+    .order-meta-table td {
+      padding: 6px 10px;
+      border: 1px solid var(--rule);
       color: var(--body);
+      vertical-align: top;
     }
 
     /* ── Items table ──────────────────────────────── */
@@ -456,7 +460,7 @@
       </div>
     </div>
 
-    <!-- Bill To / Ship To / Order Meta -->
+    <!-- Bill To / Ship To -->
     <div class="doc-meta">
       <div>
         <div class="bill-to-label">Bill To</div>
@@ -468,17 +472,27 @@
         <div class="addr-name" id="ship-name">—</div>
         <div class="bill-to-address" id="shipping-address">—</div>
       </div>
-      <div>
-        <table class="order-meta-table">
-          <tbody id="order-meta-rows">
-            <tr><td>Sales Order#</td><td id="meta-so">—</td></tr>
-            <tr><td>Order Date</td><td id="meta-date">—</td></tr>
-            <tr><td>Ref#</td><td id="meta-ref">—</td></tr>
-            <tr><td>Package#</td><td id="meta-pkg">—</td></tr>
-          </tbody>
-        </table>
-      </div>
     </div>
+
+    <!-- Order Meta Table -->
+    <table class="order-meta-table">
+      <thead>
+        <tr>
+          <th>Sales Order#</th>
+          <th>Order Date</th>
+          <th>Ref#</th>
+          <th>Package#</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="meta-so">—</td>
+          <td id="meta-date">—</td>
+          <td id="meta-ref">—</td>
+          <td id="meta-pkg">—</td>
+        </tr>
+      </tbody>
+    </table>
 
     <!-- Combined Package Details + Items Table -->
     <table class="items-table">
