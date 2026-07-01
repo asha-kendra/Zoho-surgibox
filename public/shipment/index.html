@@ -352,9 +352,8 @@
       <thead>
         <tr>
           <th style="width:32px;">#</th>
-          <th style="width:130px;">Item</th>
           <th style="width:100px;">SKU</th>
-          <th>Description</th>
+          <th>Item &amp; Description</th>
           <th style="width:64px;" class="r">Qty Ordered</th>
           <th style="width:64px;" class="r">Qty Shipped</th>
           <th style="width:72px;" class="r">Rate</th>
@@ -481,7 +480,7 @@
       const items = shipment.line_items || so.line_items || [];
       const tbody = $id('items-body');
       if (items.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999;padding:20px;">No items</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:20px;">No items</td></tr>';
       } else {
         tbody.innerHTML = items.map((it, i) => {
           const qtyOrdered = it.quantity_ordered != null ? it.quantity_ordered : (it.quantity ?? '—');
@@ -491,9 +490,8 @@
                        : (it.rate != null && qtyShipped !== '—' ? `$${fmt(parseFloat(it.rate) * parseFloat(qtyShipped))}` : '—');
           return `<tr>
             <td class="c">${i + 1}</td>
-            <td>${it.name || it.item_name || '—'}</td>
             <td>${it.sku || '—'}</td>
-            <td>${it.description || '—'}</td>
+            <td><strong>${it.name || it.item_name || '—'}</strong>${it.description ? `<br><span style="color:#555;font-size:0.88em;">${it.description}</span>` : ''}</td>
             <td class="r">${qtyOrdered}</td>
             <td class="r">${qtyShipped}</td>
             <td class="r">${rate}</td>
