@@ -526,9 +526,8 @@
       <thead>
         <tr>
           <th style="width:28px;">#</th>
-          <th style="width:120px;">Item</th>
           <th style="width:90px;">SKU</th>
-          <th>Description</th>
+          <th>Item &amp; Description</th>
           <th style="width:72px;">HS Code</th>
           <th style="width:72px;">Country of Origin</th>
           <th style="width:52px;" class="r">Qty</th>
@@ -538,7 +537,7 @@
         </tr>
       </thead>
       <tbody id="items-body">
-        <tr><td colspan="10" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
+        <tr><td colspan="9" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
       </tbody>
     </table>
 
@@ -549,6 +548,10 @@
           <tr class="sub-row">
             <td>Sub Total</td>
             <td id="subtotal">—</td>
+          </tr>
+          <tr id="shipping-charge-row" style="display:none;">
+            <td>Shipping Charges</td>
+            <td id="shipping-charge">—</td>
           </tr>
           <tr>
             <td colspan="2" style="padding:4px 0;"></td>
@@ -680,9 +683,8 @@
 
         return `<tr>
           <td class="num">${i + 1}</td>
-          <td>${li.name || soLi.name || '—'}</td>
           <td style="color:#555;">${li.sku || soLi.sku || '—'}</td>
-          <td style="font-size:11.5px;">${desc || '—'}</td>
+          <td><strong>${li.name || soLi.name || '—'}</strong>${desc ? `<br><span style="color:#555;font-size:0.88em;">${desc}</span>` : ''}</td>
           <td class="c">${hs || '—'}</td>
           <td class="c">${origin || '—'}</td>
           <td class="r">${fmt(qty)}<br><span style="color:#888;font-size:10.5px;">${soLi.unit || li.unit || ''}</span></td>
@@ -695,6 +697,11 @@
       const total = so.total || subtotalSum;
       $id('subtotal').textContent = sym + fmt(so.sub_total || subtotalSum);
       $id('total').textContent    = sym + fmt(total);
+      const shippingCharge = parseFloat(so.shipping_charge) || 0;
+      if (shippingCharge > 0) {
+        $id('shipping-charge').textContent = sym + fmt(shippingCharge);
+        $id('shipping-charge-row').style.display = '';
+      }
     }
 
     // Package dimensions & weight
