@@ -91,7 +91,7 @@ async function sendPackageSlipEmail(pkg, so, contact, toEmail) {
     subject: `Your SurgiBox Package Slip – ${pkg.package_number}`,
     body: `<p>Dear ${contact.contact_name || "Customer"},</p><p>Package slip for order <strong>${so.salesorder_number}</strong> is attached.</p>`,
   });
-  const path = `/inventory/v1/salesorders/${so.salesorder_id}/packages/${pkg.package_id}/emails?organization_id=${ORG_ID}`;
+  const path = `/inventory/v1/salesorders/${so.salesorder_id}/packages/${pkg.package_id}/email?organization_id=${ORG_ID}`;
   const result = await httpsPost("www.zohoapis.com", path, body, {
     Authorization: `Zoho-oauthtoken ${token}`,
     "Content-Type": "application/json",
