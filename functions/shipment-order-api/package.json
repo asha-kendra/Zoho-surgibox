@@ -1,0 +1,12 @@
+{
+  "name": "shipment-order-api",
+  "version": "1.0.0",
+  "description": "Zoho Inventory shipment order slip API for SurgiBox",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "*"
+  }
+}

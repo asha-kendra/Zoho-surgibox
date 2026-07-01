@@ -10,11 +10,24 @@
         "lang": "Node.js",
         "type": "Advanced IO",
         "entryFile": "index.js"
+      },
+      {
+        "name": "shipment-order-api",
+        "functionName": "shipment-order-api",
+        "lang": "Node.js",
+        "type": "Advanced IO",
+        "entryFile": "index.js"
       }
     ]
   },
-  "web": {
-    "name": "app",
-    "path": "public/app"
-  }
+  "web": [
+    {
+      "name": "app",
+      "path": "public/app"
+    },
+    {
+      "name": "shipment",
+      "path": "public/shipment"
+    }
+  ]
 }

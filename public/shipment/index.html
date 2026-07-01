@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SurgiBox — Shipment Order Slip</title>
+  <script src="catalyst.config.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red:   #C8102E;
+      --ink:   #1A1A1A;
+      --body:  #333333;
+      --muted: #666666;
+      --rule:  #CCCCCC;
+      --light: #F5F5F5;
+      --white: #FFFFFF;
+    }
+
+    /* ── Action Bar ──────────────────────────────── */
+    .action-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .bar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    .bar-label { font-size: 13px; color: var(--muted); }
+    .bar-label strong { color: var(--ink); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.13s;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .btn-ghost { background: #fff; color: var(--ink); border-color: var(--rule); }
+    .btn-ghost:hover { background: var(--light); }
+
+    /* ── Layout ──────────────────────────────────── */
+    body {
+      background: #E8E8E8;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      color: var(--body);
+      padding-top: 56px;
+    }
+
+    /* ── States ──────────────────────────────────── */
+    #loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 56px);
+      gap: 14px;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #ddd;
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #error-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 56px);
+      gap: 10px;
+      text-align: center;
+      padding: 32px;
+    }
+    #error-state h2 { font-size: 18px; color: var(--red); }
+    #error-state p  { color: var(--muted); max-width: 380px; font-size: 13px; }
+
+    /* ── Document page ───────────────────────────── */
+    #slip-wrapper { display: none; padding: 24px 16px 40px; }
+
+    .page {
+      background: var(--white);
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto 24px;
+      padding: 48px 52px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+
+    /* ── Header ──────────────────────────────────── */
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 32px;
+      gap: 20px;
+    }
+    .logo-img { display: block; height: 56px; width: auto; }
+    .company-address {
+      text-align: right;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--body);
+    }
+    .company-address strong { font-size: 13px; font-weight: 700; color: var(--ink); }
+
+    /* ── Document title ──────────────────────────── */
+    .doc-title { text-align: center; margin-bottom: 24px; }
+    .doc-title span {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink);
+      border-bottom: 2px solid var(--red);
+      padding-bottom: 4px;
+    }
+
+    /* ── Addresses ───────────────────────────────── */
+    .doc-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 28px;
+      align-items: start;
+    }
+    .addr-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .addr-name  { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .addr-text  { font-size: 12px; line-height: 1.75; color: var(--body); }
+
+    /* ── Shared table style ──────────────────────── */
+    .slip-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+    .slip-table th {
+      background: var(--light);
+      font-weight: 700;
+      color: var(--ink);
+      padding: 8px 10px;
+      border: 1px solid var(--rule);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .slip-table th.r { text-align: right; }
+    .slip-table td {
+      padding: 8px 10px;
+      border: 1px solid var(--rule);
+      color: var(--body);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+    .slip-table td.r { text-align: right; font-variant-numeric: tabular-nums; }
+    .slip-table td.c { text-align: center; }
+
+    /* ── Carrier box ─────────────────────────────── */
+    .tracking-box {
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      background: var(--light);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .tracking-field label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .tracking-field span {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    /* ── Totals ──────────────────────────────────── */
+    .totals { display: flex; justify-content: flex-end; margin-top: 8px; }
+    .totals-table { border-collapse: collapse; font-size: 12px; min-width: 260px; }
+    .totals-table td { padding: 5px 10px; vertical-align: top; }
+    .totals-table td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+    .totals-table .sub-row td { border-top: 1px solid var(--rule); color: var(--body); }
+    .totals-table .total-row td {
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--ink);
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+
+    /* ── Signature block ─────────────────────────── */
+    .signature-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 32px;
+      margin-top: 40px;
+      font-size: 12px;
+    }
+    .sig-field { border-top: 1px solid var(--ink); padding-top: 6px; color: var(--muted); }
+
+    /* ── Footer ──────────────────────────────────── */
+    .page-rule { border: none; border-top: 1px solid var(--rule); margin-top: 40px; }
+    .page-number { text-align: right; font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+    /* ── Print ───────────────────────────────────── */
+    @media print {
+      body { background: #fff; padding-top: 0; }
+      .action-bar, .toast { display: none !important; }
+      #loader, #error-state { display: none !important; }
+      #slip-wrapper { display: block !important; padding: 0; }
+      .page { box-shadow: none; max-width: 100%; margin: 0; padding: 32px; }
+      .slip-table { table-layout: fixed; width: 100%; }
+      .slip-table th, .slip-table td { overflow: hidden; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Action Bar -->
+<div class="action-bar">
+  <div class="bar-brand">
+    <img src="assets/logo.jpg" alt="SurgiBox" style="height:40px;width:auto;display:block;">
+    <span class="bar-label">Shipment Order Slip &nbsp;·&nbsp; <strong id="bar-shipment-num">—</strong></span>
+  </div>
+  <button class="btn btn-ghost" onclick="window.print()">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M4 5V2h8v3M3 11H1V7a1 1 0 011-1h12a1 1 0 011 1v4h-2M4 9h8v5H4z"/>
+    </svg>
+    Print / Save PDF
+  </button>
+</div>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="spinner"></div>
+  <p style="color:#666;font-size:13px;">Loading shipment order…</p>
+</div>
+
+<!-- Error -->
+<div id="error-state">
+  <h2>Shipment order not found</h2>
+  <p id="error-msg">Could not load the shipment order. Please check the shipment_id and try again.</p>
+</div>
+
+<!-- Slip -->
+<div id="slip-wrapper">
+  <div class="page">
+
+    <div class="doc-header">
+      <img src="assets/logo.jpg" alt="SurgiBox" class="logo-img" onerror="this.style.display='none'">
+      <div class="company-address">
+        <strong>SurgiBox Inc</strong><br>
+        1035 Cambridge Street, C/O Geek Offices<br>
+        Cambridge Massachusetts<br>
+        U.S.A - 02141<br>
+        Email: sales@surgibox.com
+      </div>
+    </div>
+
+    <div class="doc-title"><span>Shipment Order Slip</span></div>
+
+    <!-- Bill To / Ship To -->
+    <div class="doc-meta">
+      <div>
+        <div class="addr-label">Bill To</div>
+        <div class="addr-name" id="customer-name">—</div>
+        <div class="addr-text" id="billing-address">—</div>
+      </div>
+      <div>
+        <div class="addr-label">Ship To</div>
+        <div class="addr-name" id="ship-name">—</div>
+        <div class="addr-text" id="shipping-address">—</div>
+      </div>
+    </div>
+
+    <!-- Order Meta -->
+    <table class="slip-table">
+      <thead>
+        <tr>
+          <th>Sales Order#</th>
+          <th>Shipment#</th>
+          <th>Order Date</th>
+          <th>Shipment Date</th>
+          <th>Delivery Date</th>
+          <th>Ref#</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="meta-so">—</td>
+          <td id="meta-shipment">—</td>
+          <td id="meta-order-date">—</td>
+          <td id="meta-ship-date">—</td>
+          <td id="meta-delivery-date">—</td>
+          <td id="meta-ref">—</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Carrier / Tracking -->
+    <div class="tracking-box">
+      <div class="tracking-field">
+        <label>Carrier</label>
+        <span id="carrier">—</span>
+      </div>
+      <div class="tracking-field">
+        <label>Tracking Number</label>
+        <span id="tracking-number">—</span>
+      </div>
+      <div class="tracking-field">
+        <label>Shipping Method</label>
+        <span id="shipping-method">—</span>
+      </div>
+    </div>
+
+    <!-- Line Items -->
+    <table class="slip-table">
+      <thead>
+        <tr>
+          <th style="width:32px;">#</th>
+          <th style="width:130px;">Item</th>
+          <th style="width:100px;">SKU</th>
+          <th>Description</th>
+          <th style="width:64px;" class="r">Qty Ordered</th>
+          <th style="width:64px;" class="r">Qty Shipped</th>
+          <th style="width:72px;" class="r">Rate</th>
+          <th style="width:80px;" class="r">Amount</th>
+        </tr>
+      </thead>
+      <tbody id="items-body">
+        <tr><td colspan="8" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div class="totals">
+      <table class="totals-table">
+        <tbody>
+          <tr class="sub-row">
+            <td>Sub Total</td>
+            <td id="subtotal">—</td>
+          </tr>
+          <tr><td colspan="2" style="padding:4px 0;"></td></tr>
+          <tr class="total-row">
+            <td>Total</td>
+            <td id="total">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Notes -->
+    <div id="notes-block" style="display:none;margin-top:24px;font-size:12px;">
+      <div style="font-weight:700;color:var(--ink);margin-bottom:4px;">Notes</div>
+      <div id="notes-text" style="color:var(--body);line-height:1.75;"></div>
+    </div>
+
+    <!-- Signature -->
+    <div class="signature-block">
+      <div class="sig-field">Prepared by</div>
+      <div class="sig-field">Received by</div>
+      <div class="sig-field">Date</div>
+    </div>
+
+    <hr class="page-rule">
+    <div class="page-number">1</div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = (typeof window.CATALYST_API_BASE !== 'undefined')
+    ? window.CATALYST_API_BASE
+    : '/api';
+
+  function $id(id) { return document.getElementById(id); }
+
+  function fmt(n) {
+    if (n == null || n === '') return '—';
+    const num = parseFloat(n);
+    if (isNaN(num)) return n;
+    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function fmtDate(d) {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); }
+    catch { return d; }
+  }
+
+  function fmtAddr(addr) {
+    if (!addr) return '—';
+    return [
+      addr.attention, addr.address, addr.street2,
+      [addr.city, addr.state].filter(Boolean).join(', '),
+      addr.zip, addr.country,
+    ].filter(Boolean).join('\n');
+  }
+
+  function setAddr(id, text) {
+    const el = $id(id);
+    if (!el) return;
+    el.innerHTML = (text || '—').split('\n').map(l => `<div>${l}</div>`).join('');
+  }
+
+  async function loadShipment() {
+    const params = new URLSearchParams(window.location.search);
+    const shipmentId = params.get('shipment_id');
+
+    if (!shipmentId) {
+      $id('loader').style.display = 'none';
+      $id('error-state').style.display = 'flex';
+      $id('error-msg').textContent = 'No shipment_id provided in the URL. Add ?shipment_id=YOUR_ID to the URL.';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}?shipment_id=${encodeURIComponent(shipmentId)}`);
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.detail || json.error || 'Unknown error');
+
+      const { shipment, salesOrder: so, contact } = json.data;
+
+      $id('bar-shipment-num').textContent = shipment.shipment_number || shipmentId;
+
+      // Addresses
+      $id('customer-name').textContent = contact.contact_name || so.customer_name || '—';
+      setAddr('billing-address', fmtAddr(contact.billing_address || so.billing_address));
+
+      const shipAddr = shipment.shipping_address || so.shipping_address;
+      $id('ship-name').textContent = shipAddr?.attention || contact.contact_name || '—';
+      setAddr('shipping-address', fmtAddr(shipAddr));
+
+      // Meta
+      $id('meta-so').textContent           = so.salesorder_number || '—';
+      $id('meta-shipment').textContent      = shipment.shipment_number || '—';
+      $id('meta-order-date').textContent    = fmtDate(so.date);
+      $id('meta-ship-date').textContent     = fmtDate(shipment.date);
+      $id('meta-delivery-date').textContent = fmtDate(shipment.delivery_date) || '—';
+      $id('meta-ref').textContent           = so.reference_number || '—';
+
+      // Carrier
+      $id('carrier').textContent         = shipment.carrier || '—';
+      $id('tracking-number').textContent = shipment.tracking_number || '—';
+      $id('shipping-method').textContent = shipment.shipping_service || shipment.delivery_method || '—';
+
+      // Line items
+      const items = shipment.line_items || so.line_items || [];
+      const tbody = $id('items-body');
+      if (items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999;padding:20px;">No items</td></tr>';
+      } else {
+        tbody.innerHTML = items.map((it, i) => {
+          const qtyOrdered = it.quantity_ordered != null ? it.quantity_ordered : (it.quantity ?? '—');
+          const qtyShipped = it.quantity_shipped != null ? it.quantity_shipped : (it.quantity ?? '—');
+          const rate   = it.rate != null ? `$${fmt(it.rate)}` : '—';
+          const amount = it.item_total != null ? `$${fmt(it.item_total)}`
+                       : (it.rate != null && qtyShipped !== '—' ? `$${fmt(parseFloat(it.rate) * parseFloat(qtyShipped))}` : '—');
+          return `<tr>
+            <td class="c">${i + 1}</td>
+            <td>${it.name || it.item_name || '—'}</td>
+            <td>${it.sku || '—'}</td>
+            <td>${it.description || '—'}</td>
+            <td class="r">${qtyOrdered}</td>
+            <td class="r">${qtyShipped}</td>
+            <td class="r">${rate}</td>
+            <td class="r">${amount}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      // Totals from sales order
+      $id('subtotal').textContent = so.sub_total != null ? `$${fmt(so.sub_total)}` : '—';
+      $id('total').textContent    = so.total     != null ? `$${fmt(so.total)}`     : '—';
+
+      // Notes
+      const notes = shipment.notes || so.notes || '';
+      if (notes) {
+        $id('notes-text').textContent = notes;
+        $id('notes-block').style.display = 'block';
+      }
+
+      $id('loader').style.display = 'none';
+      $id('slip-wrapper').style.display = 'block';
+
+    } catch (err) {
+      console.error(err);
+      $id('loader').style.display = 'none';
+      $id('error-state').style.display = 'flex';
+      $id('error-msg').textContent = err.message;
+    }
+  }
+
+  loadShipment();
+</script>
+</body>
+</html>
