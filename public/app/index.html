@@ -131,7 +131,7 @@
     .doc-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       margin-bottom: 32px;
       gap: 20px;
     }
@@ -427,6 +427,7 @@
   <div class="page" id="page-1">
 
     <div class="doc-header">
+      <div style="flex:1;">
       <!-- SurgiBox Logo -->
       <img src="assets/logo.jpg" alt="SurgiBox" class="logo-img"
            onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
@@ -449,20 +450,21 @@
               font-weight="900" font-size="84" fill="#C8102E" letter-spacing="-1">Box</text>
         <text x="318" y="22" font-family="Arial,sans-serif" font-size="18" fill="#C8102E">®</text>
       </svg>
+      </div>
+
+      <!-- Heading -->
+      <div style="flex:1;text-align:center;">
+        <span style="font-size:18px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--ink);">Package Slip</span>
+      </div>
 
       <!-- Company address -->
-      <div class="company-address">
+      <div class="company-address" style="flex:1;">
         <strong>SurgiBox Inc</strong><br>
         1035 Cambridge Street, C/O Geek Offices<br>
         Cambridge Massachusetts<br>
         U.S.A - 02141<br>
         Email: sales@surgibox.com
       </div>
-    </div>
-
-    <!-- Document Title -->
-    <div style="text-align:center;margin-bottom:24px;">
-      <span style="font-size:18px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--ink);">Package Slip</span>
     </div>
 
     <!-- Bill To / Ship To -->
