@@ -347,6 +347,24 @@
       </div>
     </div>
 
+    <!-- Dimensions & Weight -->
+    <table class="slip-table" id="dims-table" style="margin-bottom:16px;">
+      <thead>
+        <tr>
+          <th>Dimensions (L × W × H)</th>
+          <th class="r">Net Weight</th>
+          <th class="r">Gross Weight</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="pkg-dims">—</td>
+          <td class="r" id="pkg-net-weight">—</td>
+          <td class="r" id="pkg-gross-weight">—</td>
+        </tr>
+      </tbody>
+    </table>
+
     <!-- Line Items -->
     <table class="slip-table">
       <thead>
@@ -474,6 +492,19 @@
       $id('carrier').textContent         = shipment.carrier || '—';
       $id('tracking-number').textContent = shipment.tracking_number || '—';
       $id('shipping-method').textContent = shipment.shipping_service || shipment.delivery_method || '—';
+
+      // Dimensions & weight (from shipment packages array or top-level)
+      const pkg = (shipment.packages && shipment.packages[0]) || shipment;
+      const dim = pkg.dimensions || {};
+      const wt  = pkg.weight || {};
+      const dUnit = dim.unit || '';
+      const wUnit = wt.unit || 'kg';
+      const dimsStr = (dim.length || dim.width || dim.height)
+        ? `${dim.length || '—'} × ${dim.width || '—'} × ${dim.height || '—'}${dUnit ? ' ' + dUnit : ''}`
+        : '—';
+      $id('pkg-dims').textContent       = dimsStr;
+      $id('pkg-net-weight').textContent = wt.net_weight  != null ? `${wt.net_weight} ${wUnit}`  : (shipment.net_weight  != null ? `${shipment.net_weight} ${wUnit}`  : '—');
+      $id('pkg-gross-weight').textContent = wt.gross_weight != null ? `${wt.gross_weight} ${wUnit}` : (shipment.gross_weight != null ? `${shipment.gross_weight} ${wUnit}` : '—');
 
       // Line items
       const items = shipment.line_items || so.line_items || [];
