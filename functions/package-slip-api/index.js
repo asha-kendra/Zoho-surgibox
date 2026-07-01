@@ -117,8 +117,9 @@ app.use((req, res, next) => {
 
 app.use(async (req, res) => {
   const url = req.originalUrl || req.url || "";
-  const isPackage = req.method === "GET" && url.includes("package") && !url.includes("send-email");
-  const isEmail = req.method === "GET" && url.includes("send-email");
+  // Route by query params: send-email has both package_id + email; package has only package_id
+  const isEmail = req.method === "GET" && req.query.package_id && req.query.email;
+  const isPackage = req.method === "GET" && req.query.package_id && !req.query.email;
 
   if (isPackage) {
     const packageId = req.query.package_id;
