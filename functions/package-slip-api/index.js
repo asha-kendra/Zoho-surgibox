@@ -84,14 +84,13 @@ async function getContact(contactId) {
 
 async function sendPackageSlipEmail(pkg, so, contact, toEmail) {
   const token = await getAccessToken();
+  const slipUrl = `https://zoho-surgibox-zvuf-qgplhxvk.onslate.com/?package_id=${pkg.package_id}`;
   const body = JSON.stringify({
-    send_from_org_email_id: true,
     to_mail_ids: [toEmail],
-    cc_mail_ids: [],
     subject: `Your SurgiBox Package Slip – ${pkg.package_number}`,
-    body: `<p>Dear ${contact.contact_name || "Customer"},</p><p>Package slip for order <strong>${so.salesorder_number}</strong> is attached.</p>`,
+    body: `<p>Dear ${contact.contact_name || "Customer"},</p><p>Please find your package slip for order <strong>${so.salesorder_number}</strong> (${pkg.package_number}) using the link below:</p><p><a href="${slipUrl}">${slipUrl}</a></p><p>Thanks,<br/>SurgiBox</p>`,
   });
-  const path = `/inventory/v1/packages/${pkg.package_id}/email?organization_id=${ORG_ID}`;
+  const path = `/inventory/v1/contacts/${so.customer_id}/email?organization_id=${ORG_ID}`;
   const result = await httpsPost("www.zohoapis.com", path, body, {
     Authorization: `Zoho-oauthtoken ${token}`,
     "Content-Type": "application/json",
