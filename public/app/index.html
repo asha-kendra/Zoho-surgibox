@@ -526,7 +526,6 @@
       <thead>
         <tr>
           <th style="width:28px;">#</th>
-          <th style="width:90px;">SKU</th>
           <th>Item &amp; Description</th>
           <th style="width:72px;">HS Code</th>
           <th style="width:72px;">Country of Origin</th>
@@ -537,7 +536,7 @@
         </tr>
       </thead>
       <tbody id="items-body">
-        <tr><td colspan="9" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
+        <tr><td colspan="8" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
       </tbody>
     </table>
 
@@ -683,7 +682,6 @@
 
         return `<tr>
           <td class="num">${i + 1}</td>
-          <td style="color:#555;">${li.sku || soLi.sku || '—'}</td>
           <td><strong>${li.name || soLi.name || '—'}</strong>${desc ? `<br><span style="color:#555;font-size:0.88em;">${desc}</span>` : ''}</td>
           <td class="c">${hs || '—'}</td>
           <td class="c">${origin || '—'}</td>
