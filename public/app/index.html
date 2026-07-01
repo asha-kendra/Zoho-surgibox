@@ -368,11 +368,10 @@
         max-width: 100%;
         margin: 0;
         padding: 32px;
-        page-break-after: always;
+        page-break-after: avoid;
       }
       .items-table { table-layout: fixed; width: 100%; }
       .items-table th, .items-table td { overflow: hidden; }
-      .page:last-child { page-break-after: avoid; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -538,49 +537,6 @@
     <div class="page-number">1</div>
   </div>
 
-  <!-- PAGE 2 -->
-  <div class="page" id="page-2">
-
-    <div class="doc-section">
-      <h3>Payment Information (If Applicable)</h3>
-      <p>
-        Bank Name: Eastern Bank &nbsp;&nbsp; Account Name: SurgiBox Inc. &nbsp;&nbsp;
-        Account Number: 2995492383 &nbsp;&nbsp; SWIFT/BIC: EASRUS3B<br>
-        Beneficiary Account: 2995492383 &nbsp;&nbsp; Beneficiary Name: SURGIBOX INC &nbsp;&nbsp;
-        Account Type: Cash Management Checking
-      </p>
-    </div>
-
-    <div class="doc-section">
-      <h3>Customs Declaration:</h3>
-      <p>
-        "I/We hereby certify that the information on this invoice is true and correct and that the contents of this shipment are as stated above."
-      </p>
-      <p style="margin-top:8px;">
-        For Non-Commercial Shipments: "Value for Customs purposes only. No charge to consignee. Goods are for [demonstration/humanitarian] use and will not be resold."
-      </p>
-    </div>
-
-    <div class="doc-section">
-      <h3>Authorization</h3>
-      <div class="auth-line">
-        <div class="auth-field">
-          <label>Authorized Signature:</label>
-          &nbsp;
-        </div>
-        <div class="auth-field">
-          <label>Name/Title:</label>
-          &nbsp;
-        </div>
-        <div style="font-size:12px;white-space:nowrap;padding-bottom:4px;">
-          Date: <span id="auth-date">—</span>
-        </div>
-      </div>
-    </div>
-
-    <hr class="page-rule">
-    <div class="page-number">2</div>
-  </div>
 
 </div><!-- /#slip-wrapper -->
 
