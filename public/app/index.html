@@ -480,6 +480,7 @@
         <tr>
           <th>Sales Order#</th>
           <th>Order Date</th>
+          <th>Package Date</th>
           <th>Ref#</th>
           <th>Package#</th>
         </tr>
@@ -488,6 +489,7 @@
         <tr>
           <td id="meta-so">—</td>
           <td id="meta-date">—</td>
+          <td id="meta-pkg-date">—</td>
           <td id="meta-ref">—</td>
           <td id="meta-pkg">—</td>
         </tr>
@@ -621,10 +623,11 @@
     $id('bar-pkg-num').textContent = pkg.package_number || '—';
 
     // Order meta
-    $id('meta-so').textContent   = so.salesorder_number || '—';
-    $id('meta-date').textContent = fmtDate(so.date || pkg.date);
-    $id('meta-ref').textContent  = so.reference_number || pkg.shipment_order?.tracking_number || '—';
-    $id('meta-pkg').textContent  = pkg.package_number || '—';
+    $id('meta-so').textContent       = so.salesorder_number || '—';
+    $id('meta-date').textContent     = fmtDate(so.date);
+    $id('meta-pkg-date').textContent = fmtDate(pkg.date);
+    $id('meta-ref').textContent      = so.reference_number || pkg.shipment_order?.tracking_number || '—';
+    $id('meta-pkg').textContent      = pkg.package_number || '—';
 
     // Auth date
     $id('auth-date').textContent = fmtDate(so.date || pkg.date);
