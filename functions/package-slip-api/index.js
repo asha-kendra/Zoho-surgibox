@@ -64,11 +64,23 @@ async function zohoGet(path) {
   return httpsGet("www.zohoapis.com", fullPath, { Authorization: `Zoho-oauthtoken ${token}` });
 }
 
+// ── Package slip ───────────────────────────────────────────
+
 async function getPackageDetails(packageId) {
   const data = await zohoGet(`/packages/${packageId}`);
   if (!data.package) throw new Error(`Package not found: ${packageId} — API: ${JSON.stringify(data).slice(0, 200)}`);
   return data.package;
 }
+
+// ── Shipment order ─────────────────────────────────────────
+
+async function getShipmentOrder(shipmentId) {
+  const data = await zohoGet(`/shipmentorders/${shipmentId}`);
+  if (!data.shipmentorder) throw new Error(`Shipment order not found: ${shipmentId} — API: ${JSON.stringify(data).slice(0, 200)}`);
+  return data.shipmentorder;
+}
+
+// ── Shared ─────────────────────────────────────────────────
 
 async function getSalesOrder(salesorderId) {
   const data = await zohoGet(`/salesorders/${salesorderId}`);
@@ -82,25 +94,7 @@ async function getContact(contactId) {
   return data.contact;
 }
 
-async function sendPackageSlipEmail(pkg, so, contact, toEmail) {
-  const token = await getAccessToken();
-  const slipUrl = `https://zoho-surgibox-zvuf-qgplhxvk.onslate.com/?package_id=${pkg.package_id}`;
-  const body = JSON.stringify({
-    to_mail_ids: [toEmail],
-    subject: `Your SurgiBox Package Slip – ${pkg.package_number}`,
-    body: `<p>Dear ${contact.contact_name || "Customer"},</p><p>Your package <strong>${pkg.package_number}</strong> for order <strong>${so.salesorder_number}</strong> is ready.</p><p>View and print your package slip here:<br/><a href="${slipUrl}">${slipUrl}</a></p><p>Thanks,<br/>SurgiBox</p>`,
-  });
-  const path = `/inventory/v1/contacts/${so.customer_id}/email?organization_id=${ORG_ID}`;
-  const result = await httpsPost("www.zohoapis.com", path, body, {
-    Authorization: `Zoho-oauthtoken ${token}`,
-    "Content-Type": "application/json",
-  });
-  console.log("Zoho email API response:", JSON.stringify(result));
-  if (result.code !== 0) {
-    throw new Error(`Zoho email API error: ${result.message || JSON.stringify(result)}`);
-  }
-  return result;
-}
+// ── Express app ────────────────────────────────────────────
 
 const express = require("express");
 const app = express();
@@ -115,17 +109,17 @@ app.use((req, res, next) => {
 });
 
 app.use(async (req, res) => {
-  const url = req.originalUrl || req.url || "";
-  // Route by query params: send-email has both package_id + email; package has only package_id
-  const isEmail = req.method === "GET" && req.query.package_id && req.query.email;
-  const isPackage = req.method === "GET" && req.query.package_id && !req.query.email;
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
-  if (isPackage) {
-    const packageId = req.query.package_id;
-    if (!packageId) return res.status(400).json({ error: "package_id is required" });
+  const { package_id, shipment_id } = req.query;
+
+  // ── Route: package slip ──────────────────────────────────
+  if (package_id) {
     try {
-      const pkg = await getPackageDetails(packageId);
-      const so = await getSalesOrder(pkg.salesorder_id);
+      const pkg     = await getPackageDetails(package_id);
+      const so      = await getSalesOrder(pkg.salesorder_id);
       const contact = await getContact(so.customer_id);
       return res.status(200).json({ success: true, data: { package: pkg, salesOrder: so, contact } });
     } catch (err) {
@@ -134,25 +128,20 @@ app.use(async (req, res) => {
     }
   }
 
-  if (isEmail) {
-    const packageId = req.query.package_id;
-    if (!packageId) return res.status(400).json({ error: "package_id is required" });
+  // ── Route: shipment order slip ───────────────────────────
+  if (shipment_id) {
     try {
-      const pkg = await getPackageDetails(packageId);
-      const so = await getSalesOrder(pkg.salesorder_id);
-      const contact = await getContact(so.customer_id);
-      const toEmail = req.query.email || contact.email ||
-        (contact.contact_persons || []).find((p) => p.email)?.email;
-      if (!toEmail) return res.status(400).json({ error: "No customer email found" });
-      const zohoResult = await sendPackageSlipEmail(pkg, so, contact, toEmail);
-      return res.status(200).json({ success: true, sent_to: toEmail, zoho: zohoResult });
+      const shipment = await getShipmentOrder(shipment_id);
+      const so       = await getSalesOrder(shipment.salesorder_id);
+      const contact  = await getContact(so.customer_id);
+      return res.status(200).json({ success: true, data: { shipment, salesOrder: so, contact } });
     } catch (err) {
       console.error(err.message);
       return res.status(500).json({ error: "Internal error", detail: err.message });
     }
   }
 
-  return res.status(404).json({ error: "Route not found", method: req.method, url });
+  return res.status(400).json({ error: "package_id or shipment_id query parameter is required" });
 });
 
 module.exports = app;
