@@ -460,6 +460,11 @@
       </div>
     </div>
 
+    <!-- Document Title -->
+    <div style="text-align:center;margin-bottom:24px;">
+      <span style="font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink);border-bottom:2px solid var(--red);padding-bottom:4px;">Package Slip</span>
+    </div>
+
     <!-- Bill To / Ship To -->
     <div class="doc-meta">
       <div>
@@ -496,22 +501,29 @@
       </tbody>
     </table>
 
-    <!-- Combined Package Details + Items Table -->
-    <table class="items-table">
+    <!-- Package Dimensions Table -->
+    <table class="items-table" style="margin-bottom:16px;">
       <thead>
         <tr>
-          <th colspan="4" style="background:var(--light);">Package Dimensions (L × W × H)</th>
-          <th style="background:var(--light);">Net Weight</th>
-          <th style="background:var(--light);">Gross Weight</th>
-          <th colspan="4" style="background:var(--light);">Carrier</th>
+          <th>Dimensions (L × W × H)</th>
+          <th>Net Weight</th>
+          <th>Gross Weight</th>
+          <th>Carrier</th>
         </tr>
-        <tr id="pkg-details-row">
-          <td colspan="4" id="pkg-dimensions" style="border:1px solid var(--rule);padding:8px 10px;">—</td>
-          <td id="pkg-net-weight" style="border:1px solid var(--rule);padding:8px 10px;">—</td>
-          <td id="pkg-gross-weight" style="border:1px solid var(--rule);padding:8px 10px;">—</td>
-          <td colspan="4" id="pkg-carrier" style="border:1px solid var(--rule);padding:8px 10px;">—</td>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="pkg-dimensions">—</td>
+          <td id="pkg-net-weight">—</td>
+          <td id="pkg-gross-weight">—</td>
+          <td id="pkg-carrier">—</td>
         </tr>
-        <tr><td colspan="10" style="padding:0;border-left:1px solid var(--rule);border-right:1px solid var(--rule);height:12px;background:#fff;border-top:none;border-bottom:none;"></td></tr>
+      </tbody>
+    </table>
+
+    <!-- Line Items Table -->
+    <table class="items-table">
+      <thead>
         <tr>
           <th style="width:28px;">#</th>
           <th style="width:120px;">Item</th>
