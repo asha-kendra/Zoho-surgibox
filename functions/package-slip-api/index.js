@@ -144,8 +144,8 @@ app.use(async (req, res) => {
       const toEmail = req.query.email || contact.email ||
         (contact.contact_persons || []).find((p) => p.email)?.email;
       if (!toEmail) return res.status(400).json({ error: "No customer email found" });
-      await sendPackageSlipEmail(pkg, so, contact, toEmail);
-      return res.status(200).json({ success: true, sent_to: toEmail });
+      const zohoResult = await sendPackageSlipEmail(pkg, so, contact, toEmail);
+      return res.status(200).json({ success: true, sent_to: toEmail, zoho: zohoResult });
     } catch (err) {
       console.error(err.message);
       return res.status(500).json({ error: "Internal error", detail: err.message });
