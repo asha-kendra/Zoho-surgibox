@@ -373,31 +373,13 @@
           <th>Item &amp; Description</th>
           <th style="width:64px;" class="r">Qty Ordered</th>
           <th style="width:64px;" class="r">Qty Shipped</th>
-          <th style="width:72px;" class="r">Rate</th>
-          <th style="width:80px;" class="r">Amount</th>
         </tr>
       </thead>
       <tbody id="items-body">
-        <tr><td colspan="8" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
+        <tr><td colspan="4" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
       </tbody>
     </table>
 
-    <!-- Totals -->
-    <div class="totals">
-      <table class="totals-table">
-        <tbody>
-          <tr class="sub-row">
-            <td>Sub Total</td>
-            <td id="subtotal">—</td>
-          </tr>
-          <tr><td colspan="2" style="padding:4px 0;"></td></tr>
-          <tr class="total-row">
-            <td>Total</td>
-            <td id="total">—</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
 
     <!-- Notes -->
     <div id="notes-block" style="display:none;margin-top:24px;font-size:12px;">
@@ -507,23 +489,14 @@
         tbody.innerHTML = items.map((it, i) => {
           const qtyOrdered = it.quantity_ordered != null ? it.quantity_ordered : (it.quantity ?? '—');
           const qtyShipped = it.quantity_shipped != null ? it.quantity_shipped : (it.quantity ?? '—');
-          const rate   = it.rate != null ? `$${fmt(it.rate)}` : '—';
-          const amount = it.item_total != null ? `$${fmt(it.item_total)}`
-                       : (it.rate != null && qtyShipped !== '—' ? `$${fmt(parseFloat(it.rate) * parseFloat(qtyShipped))}` : '—');
           return `<tr>
             <td class="c">${i + 1}</td>
             <td><strong>${it.name || it.item_name || '—'}</strong>${it.description ? `<br><span style="color:#555;font-size:0.88em;">${it.description}</span>` : ''}</td>
             <td class="r">${qtyOrdered}</td>
             <td class="r">${qtyShipped}</td>
-            <td class="r">${rate}</td>
-            <td class="r">${amount}</td>
           </tr>`;
         }).join('');
       }
-
-      // Totals from sales order
-      $id('subtotal').textContent = so.sub_total != null ? `$${fmt(so.sub_total)}` : '—';
-      $id('total').textContent    = so.total     != null ? `$${fmt(so.total)}`     : '—';
 
       // Notes
       const notes = shipment.notes || so.notes || '';
