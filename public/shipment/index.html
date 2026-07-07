@@ -371,12 +371,14 @@
         <tr>
           <th style="width:32px;">#</th>
           <th>Item &amp; Description</th>
+          <th style="width:72px;">HS Code</th>
+          <th style="width:100px;">Country of Origin</th>
           <th style="width:64px;" class="r">Qty Ordered</th>
           <th style="width:64px;" class="r">Qty Shipped</th>
         </tr>
       </thead>
       <tbody id="items-body">
-        <tr><td colspan="4" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
+        <tr><td colspan="6" style="text-align:center;color:#999;padding:20px;">No items</td></tr>
       </tbody>
     </table>
 
@@ -489,9 +491,13 @@
         tbody.innerHTML = items.map((it, i) => {
           const qtyOrdered = it.quantity_ordered != null ? it.quantity_ordered : (it.quantity ?? '—');
           const qtyShipped = it.quantity_shipped != null ? it.quantity_shipped : (it.quantity ?? '—');
+          const hs     = it.hsn_or_sac || '—';
+          const origin = it.country_of_origin || '—';
           return `<tr>
             <td class="c">${i + 1}</td>
             <td><strong>${it.name || it.item_name || '—'}</strong>${it.description ? `<br><span style="color:#555;font-size:0.88em;">${it.description}</span>` : ''}</td>
+            <td class="c">${hs}</td>
+            <td class="c">${origin}</td>
             <td class="r">${qtyOrdered}</td>
             <td class="r">${qtyShipped}</td>
           </tr>`;
