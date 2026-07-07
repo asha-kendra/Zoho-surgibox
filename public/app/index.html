@@ -667,14 +667,6 @@
         </tr>`;
       }).join('');
 
-      const total = so.total || subtotalSum;
-      $id('subtotal').textContent = sym + fmt(so.sub_total || subtotalSum);
-      $id('total').textContent    = sym + fmt(total);
-      const shippingCharge = parseFloat(so.shipping_charge) || 0;
-      if (shippingCharge > 0) {
-        $id('shipping-charge').textContent = sym + fmt(shippingCharge);
-        $id('shipping-charge-row').style.display = '';
-      }
     }
 
     // Package dimensions & weight
